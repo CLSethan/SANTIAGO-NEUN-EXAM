@@ -8,7 +8,7 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
     [SerializeField] private PlayerUnit _selectedUnit;
     [SerializeField] private LayerMask _unitLayerMask;
 
-
+    private bool _isBusy;
     public event EventHandler OnSelectedUnitChanged;
 
     private void Awake()
@@ -18,6 +18,11 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
 
     void Update()
     {
+        if(_isBusy)
+        {
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             // avoid unit from moving simultaneously to selecting by returning if unit is already selected
@@ -31,10 +36,17 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
                 //move selected unit if grid position is valid
                 if (_selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
                 {
+                    SetBusy();
                     // get selected unit's move action and move to mouse position
-                    _selectedUnit.GetMoveAction().Move(mouseGridPosition);
+                    _selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
                 }
             }
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            SetBusy();
+            _selectedUnit.GetSpinAction().Spin(ClearBusy);
         }
     }
 
@@ -53,6 +65,7 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
         }
         return false;
     }
+
     //set selected unit
     private void SetSelectedUnit(PlayerUnit unit)
     {
@@ -61,9 +74,20 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
 
     }
+
     // get selected unit
     public PlayerUnit GetSelectedUnit()
     {
         return _selectedUnit;
+    }
+
+    private void SetBusy()
+    {
+        _isBusy = true;
+    }
+
+    private void ClearBusy()
+    {
+        _isBusy = false;
     }
 }
