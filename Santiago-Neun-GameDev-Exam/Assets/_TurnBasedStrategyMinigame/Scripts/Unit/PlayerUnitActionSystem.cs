@@ -6,14 +6,18 @@ using UnityEngine.EventSystems;
 
 public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
 {
+
     [SerializeField] private PlayerUnit _selectedUnit;
     [SerializeField] private BaseAction _selectedAction;
     [SerializeField] private LayerMask _unitLayerMask;
 
     private bool _isBusy;
+
+    //event handlers
     public event EventHandler OnSelectedUnitChanged;
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
+    public event EventHandler OnActionStarted;
 
 
     private void Awake()
@@ -74,9 +78,17 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
 
             if(_selectedAction.IsValidActionGridPosition(mouseGridPosition))
             {
-                SetBusy();
-                // clear busy using base action delegate
-                _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
+                //take action if selected unit has enough action points
+                if (_selectedUnit.TrySpendAP(_selectedAction))
+                {
+                    SetBusy();
+                    // take action then clear busy using base action delegate
+                    _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
+
+                    //check for event subscribers and fire event
+                    OnActionStarted?.Invoke(this, EventArgs.Empty);
+
+                }
             }
         }
     }
@@ -113,9 +125,9 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
         {
             SetSelectedAction(_selectedUnit.GetMoveAction());
         }
+
         //check for event subscribers and fire event
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
-
     }
 
     // get selected unit
