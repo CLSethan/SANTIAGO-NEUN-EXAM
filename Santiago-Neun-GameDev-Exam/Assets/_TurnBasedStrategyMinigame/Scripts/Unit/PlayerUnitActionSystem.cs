@@ -25,7 +25,15 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
 
             if (_selectedUnit != null)
             {
-                _selectedUnit.Move(MouseWorld.GetPosition());
+                // convert mouse world position to grid position
+                GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
+
+                //move selected unit if grid position is valid
+                if (_selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
+                {
+                    // get selected unit's move action and move to mouse position
+                    _selectedUnit.GetMoveAction().Move(mouseGridPosition);
+                }
             }
         }
     }

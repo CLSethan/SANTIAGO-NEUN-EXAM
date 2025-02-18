@@ -59,12 +59,22 @@ public class GridSystem
     {
         return _gridObjectArray[gridPosition.x, gridPosition.z];
     }
-    // check if selected grid position is valid
+    // check if selected grid position is within bounds
     public bool IsValidGridPosition(GridPosition gridPosition)
     {
         return gridPosition.x >= 0 && 
             gridPosition.z >= 0 && 
             gridPosition.x < _width && 
             gridPosition.z < _height;
+    }
+
+    public int GetWidth()
+    {
+        return _width;
+    }
+
+    public int GetHeight()
+    {
+        return _height;
     }
 }

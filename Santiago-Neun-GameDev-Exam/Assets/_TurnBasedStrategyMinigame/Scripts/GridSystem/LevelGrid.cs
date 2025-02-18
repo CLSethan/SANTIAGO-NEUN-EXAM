@@ -67,6 +67,16 @@ public class LevelGrid : Singleton<LevelGrid>
         return _gridSystem.IsValidGridPosition(gridPosition);
     }
 
+    public int GetWidth()
+    {
+        return _gridSystem.GetWidth();
+    }
+
+    public int GetHeight()
+    {
+        return _gridSystem.GetHeight();
+    }
+
     //check if grid position is occupied by another unit
     public bool HasAnyUnitOnGridPosition(GridPosition gridPosition)
     {

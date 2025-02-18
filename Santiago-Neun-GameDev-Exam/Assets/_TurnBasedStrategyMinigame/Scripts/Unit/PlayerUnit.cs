@@ -3,25 +3,11 @@ using UnityEngine;
 public class PlayerUnit : MonoBehaviour
 {
 
-    private Vector3 _targetPosition;
-
-    //movement variables
-    [SerializeField]
-    private float _moveSpeed;
-    [SerializeField]
-    private float _rotateSpeed;
-    [SerializeField]
-    private float _stoppingDistance;
-
-    // animation variables
-    [SerializeField]
-    private Animator _unitAnimator;
     private GridPosition _gridPosition;
-
-
+    private MoveAction _moveAction;
     private void Awake()
     {
-        _targetPosition = transform.position;
+        _moveAction = GetComponent<MoveAction>();
     }
 
     private void Start()
@@ -32,22 +18,6 @@ public class PlayerUnit : MonoBehaviour
 
     void Update()
     {
-        // if distance between current position and target position is further than stopping position, move to target position.
-        if (Vector3.Distance(transform.position, _targetPosition) > _stoppingDistance)
-        {
-            Vector3 moveDirection = (_targetPosition - transform.position).normalized;
-            transform.position += moveDirection * _moveSpeed * Time.deltaTime;
-
-            //smooth rotation
-            transform.forward = Vector3.Lerp(transform.forward, moveDirection, _rotateSpeed * Time.deltaTime);
-            _unitAnimator.SetBool("isWalking", true);
-        }
-
-        else
-        {
-            _unitAnimator.SetBool("isWalking", false);
-        }
-
         //check if unit changed grid position
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         if (newGridPosition != _gridPosition)
@@ -57,10 +27,9 @@ public class PlayerUnit : MonoBehaviour
             _gridPosition = newGridPosition;
         }
     }
-
-    public void Move(Vector3 targetPosition)
+    public MoveAction GetMoveAction()
     {
-        this._targetPosition = targetPosition;
+        return _moveAction;
     }
 
     public GridPosition GetGridPosition()
