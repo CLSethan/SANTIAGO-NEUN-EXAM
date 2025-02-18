@@ -43,34 +43,29 @@ public class MoveAction : BaseAction
             //rotate towards move direction
             transform.forward = Vector3.Lerp(transform.forward, moveDirection, _rotateSpeed * Time.deltaTime);
             unitAnimator.SetBool("isWalking", true);
-            //clear action
-            _onActionComplete();
+            
         }
 
         else
         {
             unitAnimator.SetBool("isWalking", false);
             _isActive = false;
+
+            //clear action
+            _onActionComplete();
         }
     }
 
     // move to grid position
-    public void Move(GridPosition gridPosition, Action onActionComplete)
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         this._onActionComplete = onActionComplete;
         this._targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
         _isActive = true;
     }
 
-    //check list if grid position is valid
-    public bool IsValidActionGridPosition(GridPosition gridPosition)
-    {
-        List<GridPosition> validGridPositionList = GetValidActionGridPositionList();
-        return validGridPositionList.Contains(gridPosition);
-    }
-
     //get all valid grid positions within range
-    public List<GridPosition> GetValidActionGridPositionList()
+    public override List<GridPosition> GetValidActionGridPositionList()
     {
         List<GridPosition> validGridPositionList = new List<GridPosition>();
         GridPosition unitGridPosition = _unit.GetGridPosition();
@@ -81,7 +76,6 @@ public class MoveAction : BaseAction
             for(int z = -_maxMoveDistance; z <= _maxMoveDistance; z++)
             {
                 GridPosition offsetGridPosition = new GridPosition(x, z);
-                //final grid position
                 GridPosition testGridPosition = offsetGridPosition + unitGridPosition;
 
                 //invalid if testgrid position is outside of levelgrid bounds
@@ -89,13 +83,11 @@ public class MoveAction : BaseAction
                 {
                     continue;
                 }
-                
                 // invalid if unit is already on testgridposition
                 if(unitGridPosition == testGridPosition)
                 {
                     continue;
                 }
-
                 // invalid if test grid position is occupied
                 if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
                 {
@@ -105,7 +97,11 @@ public class MoveAction : BaseAction
                 validGridPositionList.Add(testGridPosition);
             }
         }
-
         return validGridPositionList;
+    }
+
+    public override string GetActionName()
+    {
+        return "Move";
     }
 }

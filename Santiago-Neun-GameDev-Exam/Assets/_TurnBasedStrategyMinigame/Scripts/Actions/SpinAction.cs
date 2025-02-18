@@ -1,15 +1,16 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public class SpinAction : BaseAction
 {
-    
+
     private float _totalSpinAmount;
 
 
     private void Update()
     {
-        if(!_isActive)
+        if (!_isActive)
         {
             return;
         }
@@ -18,17 +19,33 @@ public class SpinAction : BaseAction
         transform.eulerAngles += new Vector3(0, spinAddAmount, 0);
 
         _totalSpinAmount += spinAddAmount;
-        if(_totalSpinAmount >= 360f)
+        if (_totalSpinAmount >= 360f)
         {
             _isActive = false;
             _onActionComplete();
         }
     }
 
-    public void Spin(Action OnActionComplete)
+    public override void TakeAction(GridPosition gridPosition, Action OnActionComplete)
     {
         this._onActionComplete = OnActionComplete;
         _isActive = true;
         _totalSpinAmount = 0f;
+    }
+
+    public override string GetActionName()
+    {
+        return "Spin";
+    }
+
+    public override List<GridPosition> GetValidActionGridPositionList()
+    {
+        // get current grid position
+        GridPosition unitGridPosition = _unit.GetGridPosition();
+
+        return new List<GridPosition>
+        {
+            unitGridPosition
+        };
     }
 }

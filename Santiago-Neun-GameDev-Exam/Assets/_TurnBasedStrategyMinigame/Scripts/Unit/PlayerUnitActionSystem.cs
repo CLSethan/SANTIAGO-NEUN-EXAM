@@ -1,19 +1,28 @@
 using System;
 using UnityEngine;
 using NF.Main.Core;
+using UnityEngine.EventSystems;
 
 
 public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
 {
     [SerializeField] private PlayerUnit _selectedUnit;
+    [SerializeField] private BaseAction _selectedAction;
     [SerializeField] private LayerMask _unitLayerMask;
 
     private bool _isBusy;
     public event EventHandler OnSelectedUnitChanged;
+    public event EventHandler OnSelectedActionChanged;
+    public event EventHandler<bool> OnBusyChanged;
+
 
     private void Awake()
     {
         Instance = this;
+    }
+    private void Start()
+    {
+        SetSelectedUnit(_selectedUnit);
     }
 
     void Update()
@@ -23,44 +32,74 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
             return;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        // for checking if there is UI over a position
+        if(EventSystem.current.IsPointerOverGameObject())
         {
-            // avoid unit from moving simultaneously to selecting by returning if unit is already selected
-            if (TryHandleUnitSelection()) return;
-
-            if (_selectedUnit != null)
-            {
-                // convert mouse world position to grid position
-                GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
-
-                //move selected unit if grid position is valid
-                if (_selectedUnit.GetMoveAction().IsValidActionGridPosition(mouseGridPosition))
-                {
-                    SetBusy();
-                    // get selected unit's move action and move to mouse position
-                    _selectedUnit.GetMoveAction().Move(mouseGridPosition, ClearBusy);
-                }
-            }
+            return;
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (TryHandleUnitSelection())
         {
-            SetBusy();
-            _selectedUnit.GetSpinAction().Spin(ClearBusy);
+            return;
+        }
+
+        HandleSelectedAction();
+
+    }
+
+    private void HandleSelectedAction()
+    {
+        if(Input.GetMouseButton(0))
+        {
+            GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
+
+            //refactored action code block
+            /*
+            switch(_selectedAction)
+            {
+                case MoveAction moveAction:
+                    if(moveAction.IsValidActionGridPosition(mouseGridPosition))
+                    {
+                        SetBusy();
+                        moveAction.Move(mouseGridPosition, ClearBusy);
+                    }
+                    break;
+                case SpinAction spinAction:
+                    SetBusy();
+                    spinAction.Spin(ClearBusy);
+                    break;
+
+            }
+            */
+
+            if(_selectedAction.IsValidActionGridPosition(mouseGridPosition))
+            {
+                SetBusy();
+                // clear busy using base action delegate
+                _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
+            }
         }
     }
 
     // select unit on raycast
     private bool TryHandleUnitSelection()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, float.MaxValue, _unitLayerMask))
+        if(Input.GetMouseButtonDown(0))
         {
-            if (hitInfo.transform.TryGetComponent<PlayerUnit>(out PlayerUnit unit))
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, float.MaxValue, _unitLayerMask))
             {
-                SetSelectedUnit(unit);
-                return true;
+                if (hitInfo.transform.TryGetComponent<PlayerUnit>(out PlayerUnit unit))
+                {
+                    // return false if unit is same as selected unit
+                    if(unit == _selectedUnit)
+                    {
+                        return false;
+                    }
+                    SetSelectedUnit(unit);
+                    return true;
+                }
             }
         }
         return false;
@@ -70,6 +109,10 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
     private void SetSelectedUnit(PlayerUnit unit)
     {
         _selectedUnit = unit;
+        if(_selectedUnit!= null)
+        {
+            SetSelectedAction(_selectedUnit.GetMoveAction());
+        }
         //check for event subscribers and fire event
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
 
@@ -81,13 +124,30 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
         return _selectedUnit;
     }
 
+    public void SetSelectedAction(BaseAction baseAction)
+    {
+        _selectedAction = baseAction;
+        //check for event subscribers and fire event
+        OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
+
+    }
+    public BaseAction GetSelectedAction()
+    {
+        return _selectedAction;
+    }
+
     private void SetBusy()
     {
         _isBusy = true;
+        //check for event subscribers and fire event
+        OnBusyChanged?.Invoke(this, _isBusy);
+
     }
 
     private void ClearBusy()
     {
         _isBusy = false;
+        //check for event subscribers and fire event
+        OnBusyChanged?.Invoke(this, _isBusy);
     }
 }
