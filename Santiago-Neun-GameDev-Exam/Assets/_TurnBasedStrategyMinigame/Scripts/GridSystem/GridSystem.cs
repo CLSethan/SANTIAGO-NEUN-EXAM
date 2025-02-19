@@ -1,19 +1,20 @@
+using System;
 using UnityEngine;
 
-public class GridSystem
+public class GridSystem<TGridObject>
 {
     private int _width;
     private int _height;
     private float _cellSize;
-    private GridObject[,] _gridObjectArray;
+    private TGridObject[,] _gridObjectArray;
 
-   public GridSystem(int width, int height, float cellSize)
+   public GridSystem(int width, int height, float cellSize, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject)
     {
         this._width = width;
         this._height = height;
         this._cellSize = cellSize;
 
-        _gridObjectArray = new GridObject[width, height];
+        _gridObjectArray = new TGridObject[width, height];
 
         //cycle through width and height
         for (int x = 0; x < width; x++)
@@ -23,7 +24,7 @@ public class GridSystem
                 //Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x, z) + Vector3.right * .2f, Color.red, 1000);
                 GridPosition gridPosition = new GridPosition(x, z);
                 //create and store gridobjects
-                _gridObjectArray[x, z] =  new GridObject(this, gridPosition);
+                _gridObjectArray[x, z] =  createGridObject(this, gridPosition);
             }
         }
     }
@@ -55,7 +56,7 @@ public class GridSystem
         }
     }
     // get gameobjects inside their current gridposition
-    public GridObject GetGridObject(GridPosition gridPosition)
+    public TGridObject GetGridObject(GridPosition gridPosition)
     {
         return _gridObjectArray[gridPosition.x, gridPosition.z];
     }

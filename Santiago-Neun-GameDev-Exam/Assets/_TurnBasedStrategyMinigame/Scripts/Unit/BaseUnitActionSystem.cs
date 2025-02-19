@@ -61,14 +61,14 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
 
     private void HandleSelectedAction()
     {
-        if(Input.GetMouseButton(0))
+        if (InputManager.Instance.IsMouseButtonDown())
         {
 
             if (_selectedAction == null)
             {
                 return;
             }
-            GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
+            GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.Instance.GetPosition());
 
             //refactored action code block
             /*
@@ -110,9 +110,9 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
     // select unit on raycast
     private bool TryHandleUnitSelection()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (InputManager.Instance.IsMouseButtonDown())
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = Camera.main.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
 
             if (Physics.Raycast(ray, out RaycastHit hitInfo, float.MaxValue, _unitLayerMask))
             {

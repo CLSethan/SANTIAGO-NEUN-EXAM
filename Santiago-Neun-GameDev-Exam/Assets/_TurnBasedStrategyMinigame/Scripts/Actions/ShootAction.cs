@@ -25,6 +25,9 @@ public class ShootAction : BaseAction
     private float _cooloffStateTime = 0.5f;
     [SerializeField]
     private int _damage = 40;
+    [SerializeField] 
+    private LayerMask obstaclesLayerMask;
+
     private float _stateTimer;
 
     private BaseUnit _targetUnit;
@@ -165,6 +168,18 @@ public class ShootAction : BaseAction
                 {
                     continue;
                 }
+                // invalid if being blocked by an obstacle
+                Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitGridPosition);
+                Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+                float unitShoulderHeight = 1.7f;
+
+                if (Physics.Raycast( unitWorldPosition + Vector3.up * unitShoulderHeight, shootDir, 
+                    Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()),
+                    obstaclesLayerMask))
+                {
+                    continue;
+                }
+
 
                 // valid grid position
                 validGridPositionList.Add(testGridPosition);

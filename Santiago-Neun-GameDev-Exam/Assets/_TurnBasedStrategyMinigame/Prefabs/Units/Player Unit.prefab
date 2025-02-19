@@ -682,7 +682,7 @@ MonoBehaviour:
   _moveSpeed: 8
   _rotateSpeed: 15
   _stoppingDistance: 0.1
-  _maxMoveDistance: 1
+  _maxMoveDistance: 3
 --- !u!114 &5615242911847533146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,7 +707,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc916ffb1c3a3384e8554a90fcb1b6ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _actionPoints: 2
+  _actionPoints: 3
   _maxActionPoints: 3
   _isEnemy: 0
 --- !u!114 &6356224770722049357
@@ -726,6 +726,10 @@ MonoBehaviour:
   _aimingStateTime: 1
   _shootStateTime: 0.1
   _cooloffStateTime: 0.5
+  _damage: 40
+  obstaclesLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &6016276909642320553
 MonoBehaviour:
   m_ObjectHideFlags: 0

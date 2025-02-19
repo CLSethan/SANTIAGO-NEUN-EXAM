@@ -5,7 +5,6 @@ public class MouseWorld : Singleton<MouseWorld>
 {
     [SerializeField]
     private LayerMask mousePlaneLayerMask;
-
     private void Awake()
     {
         Instance = this;
@@ -16,9 +15,9 @@ public class MouseWorld : Singleton<MouseWorld>
         transform.position = GetPosition();
     }
 
-    public static Vector3 GetPosition()
+    public Vector3 GetPosition()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = Camera.main.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());
         Physics.Raycast(ray, out RaycastHit raycastHit, float.MaxValue, Instance.mousePlaneLayerMask);
         return raycastHit.point;
     }

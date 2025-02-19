@@ -9,13 +9,13 @@ public class LevelGrid : Singleton<LevelGrid>
 
     public event EventHandler OnAnyUnitMovedGridPosition;
 
-    private GridSystem _gridSystem;
+    private GridSystem<GridObject> _gridSystem;
     [SerializeField]
     private int _levelGridWidth;
     [SerializeField] 
     private int _levelGridHeight;
     [SerializeField]
-    private float _levelGridCellsize;
+    private float _levelGridCellsize = 2f;
     [SerializeField]
     private GameObject _gridDebugObjectPrefab;
 
@@ -24,8 +24,14 @@ public class LevelGrid : Singleton<LevelGrid>
     {
         Instance = this;
 
-        _gridSystem = new GridSystem(_levelGridWidth, _levelGridHeight, _levelGridCellsize);
-        _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
+        _gridSystem = new GridSystem<GridObject>(_levelGridWidth, _levelGridHeight, _levelGridCellsize,
+                        (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition));
+        //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
+    }
+
+    private void Start()
+    {
+        Pathfinding.Instance.Setup(_levelGridWidth, _levelGridHeight, _levelGridCellsize);
     }
 
     // add unit to list of units at current grid position

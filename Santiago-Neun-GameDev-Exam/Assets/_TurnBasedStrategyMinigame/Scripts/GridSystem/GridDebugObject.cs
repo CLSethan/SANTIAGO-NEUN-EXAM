@@ -1,20 +1,19 @@
 using UnityEngine;
 using TMPro;
 
+
 public class GridDebugObject : MonoBehaviour
 {
     [SerializeField]
     private TextMeshPro _gridText;
-    private GridObject _gridObject;
-    
-    public void SetGridObject(GridObject gridObject)
+    private object _gridObject;
+
+    public virtual void SetGridObject(object gridObject)
     {
         this._gridObject = gridObject;
     }
-
-    private void Update()
+    protected virtual void Update()
     {
         _gridText.text = _gridObject.ToString();
     }
-
 }
