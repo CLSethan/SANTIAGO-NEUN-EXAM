@@ -63,7 +63,7 @@ public class GridSystemVisual : Singleton<GridSystemVisual>
     { 
         HideAllGridPositions();
         //show all selected unit's moveable positions
-        BaseAction selectedAction = PlayerUnitActionSystem.Instance.GetSelectedAction();
+        BaseAction selectedAction = BaseUnitActionSystem.Instance.GetSelectedAction();
         if(selectedAction != null)
         {
             ShowAllGridPositions(selectedAction.GetValidActionGridPositionList());

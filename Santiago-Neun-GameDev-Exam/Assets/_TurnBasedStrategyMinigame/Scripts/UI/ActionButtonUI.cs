@@ -22,13 +22,13 @@ public class ActionButtonUI : MonoBehaviour
         //create anonymous function for action behaviour
         _button.onClick.AddListener(() =>
         {
-            PlayerUnitActionSystem.Instance.SetSelectedAction(baseAction);
+            BaseUnitActionSystem.Instance.SetSelectedAction(baseAction);
         });
     }
 
     public void UpdateSelectedVisual()
     {
-        BaseAction selectedBaseAction = PlayerUnitActionSystem.Instance.GetSelectedAction();
+        BaseAction selectedBaseAction = BaseUnitActionSystem.Instance.GetSelectedAction();
         _selectedGameObject.SetActive(selectedBaseAction == _baseAction);
     }
 }

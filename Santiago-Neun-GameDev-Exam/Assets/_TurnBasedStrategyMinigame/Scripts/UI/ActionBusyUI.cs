@@ -5,11 +5,9 @@ public class ActionBusyUI : MonoBehaviour
 
     private void Start()
     {
-        PlayerUnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
+        BaseUnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
         Hide();
     }
-
-
 
     private void Show()
     {

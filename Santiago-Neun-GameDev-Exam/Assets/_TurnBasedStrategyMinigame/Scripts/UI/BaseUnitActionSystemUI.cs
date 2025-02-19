@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
 
-public class PlayerUnitActionSystemUI : MonoBehaviour
+public class BaseUnitActionSystemUI : MonoBehaviour
 {
     [SerializeField]
     private GameObject _actionButtonPrefab;
@@ -24,12 +24,12 @@ public class PlayerUnitActionSystemUI : MonoBehaviour
 
     private void Start()
     {
-        //subscribe to OnSelectedUnitChanged event
-        PlayerUnitActionSystem.Instance.OnSelectedUnitChanged += PlayerUnitActionSystem_OnSelectedUnitChanged;
-        PlayerUnitActionSystem.Instance.OnSelectedActionChanged += PlayerUnitActionSystem_OnSelectedActionChanged;
-        PlayerUnitActionSystem.Instance.OnActionStarted += PlayerUnitActionSystem_OnActionStarted;
+        //subscribe to Events
+        BaseUnitActionSystem.Instance.OnSelectedUnitChanged += PlayerUnitActionSystem_OnSelectedUnitChanged;
+        BaseUnitActionSystem.Instance.OnSelectedActionChanged += PlayerUnitActionSystem_OnSelectedActionChanged;
+        BaseUnitActionSystem.Instance.OnActionStarted += PlayerUnitActionSystem_OnActionStarted;
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        PlayerUnit.OnAnyActionPointsChanged += PlayerUnit_OnAnyActionPointsChanged;
+        BaseUnit.OnAnyActionPointsChanged += PlayerUnit_OnAnyActionPointsChanged;
 
         CreateUnitActionButtons();
         UpdateSelectedVisual();
@@ -47,7 +47,7 @@ public class PlayerUnitActionSystemUI : MonoBehaviour
         _actionButtonUIList.Clear();
 
         // update button based on selected unit
-        PlayerUnit selectedUnit = PlayerUnitActionSystem.Instance.GetSelectedUnit();
+        BaseUnit selectedUnit = BaseUnitActionSystem.Instance.GetSelectedUnit();
         if (selectedUnit != null)
         {
             // get all available action of selected unit
@@ -99,7 +99,7 @@ public class PlayerUnitActionSystemUI : MonoBehaviour
 
     private void UpdateAPText()
     {
-        PlayerUnit selectedUnit = PlayerUnitActionSystem.Instance.GetSelectedUnit();
+        BaseUnit selectedUnit = BaseUnitActionSystem.Instance.GetSelectedUnit();
 
         if (selectedUnit != null)
         {

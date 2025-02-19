@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class PlayerUnit : MonoBehaviour
+public class BaseUnit : MonoBehaviour
 {
 
     private GridPosition _gridPosition;
@@ -15,6 +15,7 @@ public class PlayerUnit : MonoBehaviour
     private int _actionPoints = 2;
     [SerializeField]
     private int _maxActionPoints;
+    [SerializeField] private bool _isEnemy;
 
     private void Awake()
     {
@@ -41,6 +42,11 @@ public class PlayerUnit : MonoBehaviour
             //update grid position
             _gridPosition = newGridPosition;
         }
+    }
+
+    public void Damage()
+    {
+        Debug.Log(gameObject.name + "Damaged!");
     }
 
     // check if player can spend action points then decrease it, otherwise return false
@@ -80,8 +86,18 @@ public class PlayerUnit : MonoBehaviour
     // reset action points on next turn
     private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
     {
-        _actionPoints = _maxActionPoints;
-        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        if((IsEnemy() && !TurnSystem.Instance.IsPlayerTurn()) || !IsEnemy() && TurnSystem.Instance.IsPlayerTurn())
+        {
+            _actionPoints = _maxActionPoints;
+
+            OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        }
+        
+    }
+
+    public Vector3 GetWorldPosition()
+    {
+        return transform.position;
     }
 
     public MoveAction GetMoveAction()
@@ -108,5 +124,10 @@ public class PlayerUnit : MonoBehaviour
     {
         return _actionPoints;
          
+    }
+
+    public bool IsEnemy()
+    {
+        return _isEnemy;
     }
 }

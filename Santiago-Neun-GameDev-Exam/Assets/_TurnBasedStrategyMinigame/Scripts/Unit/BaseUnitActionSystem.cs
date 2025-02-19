@@ -4,14 +4,14 @@ using NF.Main.Core;
 using UnityEngine.EventSystems;
 
 
-public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
+public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
 {
 
-    [SerializeField] private PlayerUnit _selectedUnit;
+    [SerializeField] private BaseUnit _selectedUnit;
     [SerializeField] private BaseAction _selectedAction;
     [SerializeField] private LayerMask _unitLayerMask;
-
     private bool _isBusy;
+    
 
     //event handlers
     public event EventHandler OnSelectedUnitChanged;
@@ -36,6 +36,11 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
             return;
         }
 
+        if(!TurnSystem.Instance.IsPlayerTurn())
+        {
+            return;
+        }
+
         // for checking if there is UI over a position
         if(EventSystem.current.IsPointerOverGameObject())
         {
@@ -55,6 +60,11 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
     {
         if(Input.GetMouseButton(0))
         {
+
+            if (_selectedAction == null)
+            {
+                return;
+            }
             GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
             //refactored action code block
@@ -76,18 +86,19 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
             }
             */
 
+            //check if action has valid grid position
             if(_selectedAction.IsValidActionGridPosition(mouseGridPosition))
             {
                 //take action if selected unit has enough action points
                 if (_selectedUnit.TrySpendAP(_selectedAction))
                 {
                     SetBusy();
+
                     // take action then clear busy using base action delegate
                     _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
 
                     //check for event subscribers and fire event
                     OnActionStarted?.Invoke(this, EventArgs.Empty);
-
                 }
             }
         }
@@ -102,10 +113,14 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
 
             if (Physics.Raycast(ray, out RaycastHit hitInfo, float.MaxValue, _unitLayerMask))
             {
-                if (hitInfo.transform.TryGetComponent<PlayerUnit>(out PlayerUnit unit))
+                if (hitInfo.transform.TryGetComponent<BaseUnit>(out BaseUnit unit))
                 {
-                    // return false if unit is same as selected unit
+                    // return false if unit is already selected
                     if(unit == _selectedUnit)
+                    {
+                        return false;
+                    }
+                    if(unit.IsEnemy())
                     {
                         return false;
                     }
@@ -118,7 +133,7 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
     }
 
     //set selected unit
-    private void SetSelectedUnit(PlayerUnit unit)
+    private void SetSelectedUnit(BaseUnit unit)
     {
         _selectedUnit = unit;
         if(_selectedUnit!= null)
@@ -131,7 +146,7 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
     }
 
     // get selected unit
-    public PlayerUnit GetSelectedUnit()
+    public BaseUnit GetSelectedUnit()
     {
         return _selectedUnit;
     }
@@ -162,4 +177,6 @@ public class PlayerUnitActionSystem : Singleton<PlayerUnitActionSystem>
         //check for event subscribers and fire event
         OnBusyChanged?.Invoke(this, _isBusy);
     }
+
+    
 }

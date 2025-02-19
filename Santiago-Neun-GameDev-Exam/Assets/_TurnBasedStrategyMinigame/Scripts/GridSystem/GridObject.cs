@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GridObject 
 {
-    private List<PlayerUnit> _unitList;
+    private List<BaseUnit> _unitList;
     private GridSystem _gridSystem;
     private GridPosition _gridPosition;
 
@@ -11,29 +11,29 @@ public class GridObject
     {
         this._gridSystem = gridSystem;
         this._gridPosition = gridPosition;
-        _unitList = new List<PlayerUnit>();
+        _unitList = new List<BaseUnit>();
     }
 
     public override string ToString()
     {
         string unitString = "";
-        foreach (PlayerUnit unit in _unitList)
+        foreach (BaseUnit unit in _unitList)
         {
             unitString += unit + "\n";
         }
         return _gridPosition.ToString() + "\n" + unitString;
     }
 
-    public void AddUnit(PlayerUnit unit)
+    public void AddUnit(BaseUnit unit)
     {
         _unitList.Add(unit);
     }
-    public void RemoveUnit(PlayerUnit unit) 
+    public void RemoveUnit(BaseUnit unit) 
     { 
         _unitList.Remove(unit);
     }
 
-    public List<PlayerUnit> GetUnitList()
+    public List<BaseUnit> GetUnitList()
     {
         return this._unitList;
     }
@@ -41,5 +41,18 @@ public class GridObject
     public bool HasAnyUnit()
     {
         return _unitList.Count > 0;
+    }
+
+    //get first unit on unit list
+    public BaseUnit GetUnit()
+    {
+        if(HasAnyUnit())
+        {
+            return _unitList[0];
+        }
+        else
+        {
+            return null;
+        }
     }
 }

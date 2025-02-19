@@ -25,26 +25,26 @@ public class LevelGrid : Singleton<LevelGrid>
     }
 
     // add unit to list of units at current grid position
-    public void AddUnitAtGridPosition(GridPosition gridPosition, PlayerUnit unit)
+    public void AddUnitAtGridPosition(GridPosition gridPosition, BaseUnit unit)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.AddUnit(unit);
     }
     // get units at current grid position
-    public List<PlayerUnit> GetUnitListAtGridPosition(GridPosition gridPosition)
+    public List<BaseUnit> GetUnitListAtGridPosition(GridPosition gridPosition)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.GetUnitList();
 
     }
     // remove unit from list at current grid position
-    public void RemoveUnitAtGridPosition(GridPosition gridPosition, PlayerUnit unit)
+    public void RemoveUnitAtGridPosition(GridPosition gridPosition, BaseUnit unit)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.RemoveUnit(unit);
     }
     // update grid position
-    public void UnitMovedGridPosition(PlayerUnit unit, GridPosition fromGridPosition, GridPosition toGridPosition)
+    public void UnitMovedGridPosition(BaseUnit unit, GridPosition fromGridPosition, GridPosition toGridPosition)
     {
         RemoveUnitAtGridPosition(fromGridPosition, unit);
         AddUnitAtGridPosition(toGridPosition, unit);
@@ -82,5 +82,12 @@ public class LevelGrid : Singleton<LevelGrid>
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.HasAnyUnit();
+    }
+
+    //Get first unit at grid position
+    public BaseUnit GetUnitAtGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
+        return gridObject.GetUnit();
     }
 }

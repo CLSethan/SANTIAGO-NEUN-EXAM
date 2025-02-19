@@ -24,7 +24,7 @@ public class Testing : MonoBehaviour
     //test unit
     
     [SerializeField]
-    private PlayerUnit _unit;
+    private BaseUnit _unit;
    
 
     private void Update()

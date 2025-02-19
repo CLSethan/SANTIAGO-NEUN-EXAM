@@ -4,7 +4,7 @@ using UnityEngine;
 public class UnitSelectedVisual : MonoBehaviour
 {
     [SerializeField]
-    private PlayerUnit _unit;
+    private BaseUnit _unit;
     private MeshRenderer _meshRenderer;
 
     private void Awake()
@@ -15,7 +15,7 @@ public class UnitSelectedVisual : MonoBehaviour
     private void Start()
     {
         //listen to onselectedunitchanged event
-        PlayerUnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
+        BaseUnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
 
         UpdateVisual();
     }
@@ -27,7 +27,7 @@ public class UnitSelectedVisual : MonoBehaviour
 
     private void UpdateVisual()
     {
-        if (PlayerUnitActionSystem.Instance.GetSelectedUnit() == _unit)
+        if (BaseUnitActionSystem.Instance.GetSelectedUnit() == _unit)
         {
             _meshRenderer.enabled = true;
         }

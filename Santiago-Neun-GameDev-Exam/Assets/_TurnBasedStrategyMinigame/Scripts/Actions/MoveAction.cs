@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class MoveAction : BaseAction
 {
+
+    public event EventHandler OnStartMoving;
+    public event EventHandler OnStopMoving;
+
+
     private Vector3 _targetPosition;
 
     //movement variables
@@ -15,11 +20,6 @@ public class MoveAction : BaseAction
     private float _stoppingDistance;
     [SerializeField]
     private int _maxMoveDistance;
-
-    //animation
-    [SerializeField]
-    private Animator unitAnimator;
-    
 
     protected override void Awake()
     {
@@ -42,26 +42,21 @@ public class MoveAction : BaseAction
 
             //rotate towards move direction
             transform.forward = Vector3.Lerp(transform.forward, moveDirection, _rotateSpeed * Time.deltaTime);
-            unitAnimator.SetBool("isWalking", true);
-            
         }
 
         else
         {
-            unitAnimator.SetBool("isWalking", false);
-            _isActive = false;
-
-            //clear action
-            _onActionComplete();
+            OnStopMoving?.Invoke(this, EventArgs.Empty);
+            ActionComplete();
         }
     }
 
     // move to grid position
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        this._onActionComplete = onActionComplete;
+        ActionStart(onActionComplete);
         this._targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
-        _isActive = true;
+        OnStartMoving?.Invoke(this, EventArgs.Empty);
     }
 
     //get all valid grid positions within range

@@ -25,7 +25,10 @@ namespace NF.Main.Core.PlayerStateMachine
         Idle,
         Attacking,
         Hit,
-        Death
+        Death,
+        Aiming,
+        Shooting,
+        Cooloff
     }
 }
 
