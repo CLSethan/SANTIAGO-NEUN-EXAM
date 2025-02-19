@@ -94,15 +94,44 @@ public class ShootAction : BaseAction
         _targetUnit.Damage(_damage);
     }
 
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        BaseUnit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionValue = 100 + Mathf.RoundToInt((1 - targetUnit.GetHealthNormalized()) * 100f),
+        };
+    }
+
+    //get validated targetable units at grid position
+    public int GetTargetCountAtPosition(GridPosition gridPosition)
+    {
+        return GetValidActionGridPositionList(gridPosition).Count;
+    }
+
+
     public override string GetActionName()
     {
         return "Shoot";
     }
 
+    public override int GetActionPointCost()
+    {
+        return 2;
+    }
+
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        List<GridPosition> validGridPositionList = new List<GridPosition>();
         GridPosition unitGridPosition = _unit.GetGridPosition();
+        return GetValidActionGridPositionList(unitGridPosition);
+    }
+
+    //cycle through valid shootable units at grid position
+    public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
+    {
+        List<GridPosition> validGridPositionList = new List<GridPosition>();
 
         //cycle through moveable grid positions within max range
         for (int x = -_maxShootDistance; x <= _maxShootDistance; x++)
@@ -158,6 +187,11 @@ public class ShootAction : BaseAction
     public BaseUnit GetTargetUnit()
     {
         return _targetUnit;
+    }
+
+    public int GetMaxShootDistance()
+    {
+        return _maxShootDistance;
     }
 
 }

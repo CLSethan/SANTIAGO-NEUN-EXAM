@@ -10,9 +10,15 @@ public class BaseUnit : MonoBehaviour
     // actions
     private MoveAction _moveAction;
     private SpinAction _spinAction;
+    private ShootAction shootAction;
+
     private BaseAction[] _baseActionArray;
 
+    //unit events
     public static event EventHandler OnAnyActionPointsChanged;
+    public static event EventHandler OnAnyUnitSpawned;
+    public static event EventHandler OnAnyUnitDead;
+
     [SerializeField]
     private int _actionPoints = 2;
     [SerializeField]
@@ -24,6 +30,7 @@ public class BaseUnit : MonoBehaviour
         _healthSystem = GetComponent<HealthSystem>();
         _moveAction = GetComponent<MoveAction>();
         _spinAction = GetComponent<SpinAction>();
+        shootAction = GetComponent<ShootAction>();
         _baseActionArray = GetComponents<BaseAction>();
     }
 
@@ -35,6 +42,8 @@ public class BaseUnit : MonoBehaviour
         //subscribe to events
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
         _healthSystem.OnDeath += HealthSystem_OnDeath;
+        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
+
     }
 
     void Update()
@@ -43,8 +52,12 @@ public class BaseUnit : MonoBehaviour
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         if (newGridPosition != _gridPosition)
         {
-            LevelGrid.Instance.UnitMovedGridPosition(this, _gridPosition, newGridPosition);
             //update grid position
+
+            GridPosition oldGridPosition = _gridPosition;
+            _gridPosition = newGridPosition;
+            LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
+
             _gridPosition = newGridPosition;
         }
     }
@@ -104,6 +117,7 @@ public class BaseUnit : MonoBehaviour
         // cleanup grid and destroy gameobject
         LevelGrid.Instance.RemoveUnitAtGridPosition(_gridPosition, this);
         Destroy(gameObject);
+        OnAnyUnitDead?.Invoke(this, EventArgs.Empty);
     }
 
     public Vector3 GetWorldPosition()
@@ -114,6 +128,10 @@ public class BaseUnit : MonoBehaviour
     public MoveAction GetMoveAction()
     {
         return _moveAction;
+    }
+    public ShootAction GetShootAction()
+    {
+        return shootAction;
     }
 
     public SpinAction GetSpinAction() 
@@ -135,6 +153,10 @@ public class BaseUnit : MonoBehaviour
     {
         return _actionPoints;
          
+    }
+    public float GetHealthNormalized()
+    {
+        return _healthSystem.GetHealthNormalized();
     }
 
     public bool IsEnemy()

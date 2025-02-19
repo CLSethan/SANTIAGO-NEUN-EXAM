@@ -5,9 +5,10 @@ public class TurnSystem : Singleton<TurnSystem>
 {
     private int _turnNumber = 1;
     private bool _isPlayerTurn = true;
+    
+    public TurnState _turnState;
 
     public event EventHandler OnTurnChanged;
-
     private void Awake()
     {
         Instance = this;
@@ -29,5 +30,4 @@ public class TurnSystem : Singleton<TurnSystem>
     {
         return _isPlayerTurn;
     }
-
 }

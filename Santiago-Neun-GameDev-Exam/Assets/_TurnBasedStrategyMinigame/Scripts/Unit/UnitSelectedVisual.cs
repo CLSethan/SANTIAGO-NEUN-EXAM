@@ -40,7 +40,9 @@ public class UnitSelectedVisual : MonoBehaviour
     private void OnDestroy()
     {
         //unsubscribe when unit is destroyed
-        BaseUnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
-
+        if(_unit != null)
+        {
+            BaseUnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
+        }
     }
 }

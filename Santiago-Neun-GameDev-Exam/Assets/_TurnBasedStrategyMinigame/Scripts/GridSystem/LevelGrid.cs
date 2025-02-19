@@ -1,10 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
 using NF.Main.Core;
+using System;
 
 
 public class LevelGrid : Singleton<LevelGrid>
 {
+
+    public event EventHandler OnAnyUnitMovedGridPosition;
+
     private GridSystem _gridSystem;
     [SerializeField]
     private int _levelGridWidth;
@@ -37,18 +41,22 @@ public class LevelGrid : Singleton<LevelGrid>
         return gridObject.GetUnitList();
 
     }
+
     // remove unit from list at current grid position
     public void RemoveUnitAtGridPosition(GridPosition gridPosition, BaseUnit unit)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.RemoveUnit(unit);
     }
-    // update grid position
+
+    // update grid position when unit moves
     public void UnitMovedGridPosition(BaseUnit unit, GridPosition fromGridPosition, GridPosition toGridPosition)
     {
         RemoveUnitAtGridPosition(fromGridPosition, unit);
         AddUnitAtGridPosition(toGridPosition, unit);
+        OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
     }
+
     // get grid position of world position
     public GridPosition GetGridPosition(Vector3 worldPos)
     {
