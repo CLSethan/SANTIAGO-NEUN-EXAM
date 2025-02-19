@@ -141,7 +141,7 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
         _selectedUnit = unit;
         if(_selectedUnit!= null)
         {
-            SetSelectedAction(_selectedUnit.GetMoveAction());
+            SetSelectedAction(_selectedUnit.GetAction<MoveAction>());
         }
 
         //check for event subscribers and fire event

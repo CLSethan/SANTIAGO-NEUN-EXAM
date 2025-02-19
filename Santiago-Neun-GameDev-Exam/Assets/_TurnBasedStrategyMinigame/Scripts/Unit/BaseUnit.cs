@@ -7,11 +7,6 @@ public class BaseUnit : MonoBehaviour
     private GridPosition _gridPosition;
     private HealthSystem _healthSystem;
 
-    // actions
-    private MoveAction _moveAction;
-    private SpinAction _spinAction;
-    private ShootAction shootAction;
-
     private BaseAction[] _baseActionArray;
 
     //unit events
@@ -28,9 +23,7 @@ public class BaseUnit : MonoBehaviour
     private void Awake()
     {
         _healthSystem = GetComponent<HealthSystem>();
-        _moveAction = GetComponent<MoveAction>();
-        _spinAction = GetComponent<SpinAction>();
-        shootAction = GetComponent<ShootAction>();
+
         _baseActionArray = GetComponents<BaseAction>();
     }
 
@@ -120,25 +113,22 @@ public class BaseUnit : MonoBehaviour
         OnAnyUnitDead?.Invoke(this, EventArgs.Empty);
     }
 
+    public T GetAction<T>() where T : BaseAction
+    {
+        foreach (BaseAction baseAction in _baseActionArray)
+        {
+            if (baseAction is T)
+            {
+                return (T)baseAction;
+            }
+        }
+        return null;
+    }
+
     public Vector3 GetWorldPosition()
     {
         return transform.position;
     }
-
-    public MoveAction GetMoveAction()
-    {
-        return _moveAction;
-    }
-    public ShootAction GetShootAction()
-    {
-        return shootAction;
-    }
-
-    public SpinAction GetSpinAction() 
-    {
-        return _spinAction;
-    }
-
     public GridPosition GetGridPosition()
     {
         return _gridPosition;
