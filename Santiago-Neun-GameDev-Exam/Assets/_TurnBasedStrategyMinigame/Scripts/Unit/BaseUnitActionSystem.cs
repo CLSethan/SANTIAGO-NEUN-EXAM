@@ -7,9 +7,12 @@ using UnityEngine.EventSystems;
 public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
 {
 
-    [SerializeField] private BaseUnit _selectedUnit;
-    [SerializeField] private BaseAction _selectedAction;
-    [SerializeField] private LayerMask _unitLayerMask;
+    [SerializeField] 
+    private BaseUnit _selectedUnit;
+    [SerializeField] 
+    private BaseAction _selectedAction;
+    [SerializeField] 
+    private LayerMask _unitLayerMask;
     private bool _isBusy;
     
 
@@ -42,7 +45,7 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
         }
 
         // for checking if there is UI over a position
-        if(EventSystem.current.IsPointerOverGameObject())
+        if (EventSystem.current.IsPointerOverGameObject())
         {
             return;
         }

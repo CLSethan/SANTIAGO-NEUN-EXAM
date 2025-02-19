@@ -23,6 +23,8 @@ public class ShootAction : BaseAction
     private float _shootStateTime = 0.1f;
     [SerializeField]
     private float _cooloffStateTime = 0.5f;
+    [SerializeField]
+    private int _damage = 40;
     private float _stateTimer;
 
     private BaseUnit _targetUnit;
@@ -89,7 +91,7 @@ public class ShootAction : BaseAction
             targetUnit = _targetUnit,
             shootingUnit = _unit
         });
-        _targetUnit.Damage();
+        _targetUnit.Damage(_damage);
     }
 
     public override string GetActionName()
@@ -144,11 +146,18 @@ public class ShootAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        ActionStart(onActionComplete);
         _targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
 
         _state = PlayerState.Aiming;
         _stateTimer = _aimingStateTime;
         _canShoot = true;
+        ActionStart(onActionComplete);
+
     }
+
+    public BaseUnit GetTargetUnit()
+    {
+        return _targetUnit;
+    }
+
 }

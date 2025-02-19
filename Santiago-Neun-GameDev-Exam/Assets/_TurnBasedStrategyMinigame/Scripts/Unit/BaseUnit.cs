@@ -5,12 +5,14 @@ public class BaseUnit : MonoBehaviour
 {
 
     private GridPosition _gridPosition;
+    private HealthSystem _healthSystem;
+
+    // actions
     private MoveAction _moveAction;
     private SpinAction _spinAction;
     private BaseAction[] _baseActionArray;
 
     public static event EventHandler OnAnyActionPointsChanged;
-
     [SerializeField]
     private int _actionPoints = 2;
     [SerializeField]
@@ -19,6 +21,7 @@ public class BaseUnit : MonoBehaviour
 
     private void Awake()
     {
+        _healthSystem = GetComponent<HealthSystem>();
         _moveAction = GetComponent<MoveAction>();
         _spinAction = GetComponent<SpinAction>();
         _baseActionArray = GetComponents<BaseAction>();
@@ -29,7 +32,9 @@ public class BaseUnit : MonoBehaviour
         _gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
+        //subscribe to events
         TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
+        _healthSystem.OnDeath += HealthSystem_OnDeath;
     }
 
     void Update()
@@ -44,9 +49,9 @@ public class BaseUnit : MonoBehaviour
         }
     }
 
-    public void Damage()
+    public void Damage(int damageAmount)
     {
-        Debug.Log(gameObject.name + "Damaged!");
+        _healthSystem.Damage(damageAmount);
     }
 
     // check if player can spend action points then decrease it, otherwise return false
@@ -92,7 +97,13 @@ public class BaseUnit : MonoBehaviour
 
             OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
-        
+    }
+
+    private void HealthSystem_OnDeath(object sender, EventArgs e)
+    {
+        // cleanup grid and destroy gameobject
+        LevelGrid.Instance.RemoveUnitAtGridPosition(_gridPosition, this);
+        Destroy(gameObject);
     }
 
     public Vector3 GetWorldPosition()
