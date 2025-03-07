@@ -15,7 +15,7 @@ namespace NF.Main.Core.PlayerStateMachine
             base.OnEnter();
             
             //Use this for transitioning between different animator hashes
-            //_animator.CrossFade(IdleHash, 0.5f);
+            _animator.CrossFade(IdleHash, 0.5f);
             
             Debug.Log("Entering Player Idle State");
         }

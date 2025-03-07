@@ -14,7 +14,6 @@ namespace NF.Main.Core.GameStateMachine
         {
             base.OnEnter();
             Debug.Log("Player's Turn!");
-            _turnSystem.SetIsPlayerTurn(true);
 
         }
 
@@ -22,8 +21,6 @@ namespace NF.Main.Core.GameStateMachine
         {
             base.OnExit();
             Debug.Log("Player Turn Finished");
-            _turnSystem.SetIsPlayerTurn(false);
-
         }
     }
 }

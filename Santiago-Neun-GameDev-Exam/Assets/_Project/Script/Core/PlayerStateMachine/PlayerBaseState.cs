@@ -26,6 +26,7 @@ namespace NF.Main.Core.PlayerStateMachine
         Attacking,
         Hit,
         Death,
+
         Aiming,
         Shooting,
         Cooloff

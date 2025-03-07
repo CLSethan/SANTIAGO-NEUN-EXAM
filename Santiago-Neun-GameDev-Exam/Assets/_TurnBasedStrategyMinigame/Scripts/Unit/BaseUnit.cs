@@ -5,10 +5,10 @@ using NF.Main.Gameplay;
 
 public class BaseUnit : MonoBehaviour
 {
+    [SerializeField] private UnitData unitData;
 
     private GridPosition _gridPosition;
     private HealthSystem _healthSystem;
-
     private BaseAction[] _baseActionArray;
 
     //unit events
@@ -16,17 +16,16 @@ public class BaseUnit : MonoBehaviour
     public static event EventHandler OnAnyUnitSpawned;
     public static event EventHandler OnAnyUnitDead;
 
-    [SerializeField]
-    private int _actionPoints = 2;
-    [SerializeField]
-    private int _maxActionPoints;
-    [SerializeField] private bool _isEnemy;
+    private int _actionPoints;
+    private int _currentHealth;
 
     private void Awake()
     {
         _healthSystem = GetComponent<HealthSystem>();
-
         _baseActionArray = GetComponents<BaseAction>();
+
+        _actionPoints = unitData.maxActionPoints;
+        _currentHealth = unitData.maxHealth;
     }
 
     private void Start()
@@ -101,8 +100,7 @@ public class BaseUnit : MonoBehaviour
     {
         if((IsEnemy() && !TurnSystem.Instance.IsPlayerTurn()) || !IsEnemy() && TurnSystem.Instance.IsPlayerTurn())
         {
-            _actionPoints = _maxActionPoints;
-
+            _actionPoints = unitData.maxActionPoints;
             OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -153,6 +151,6 @@ public class BaseUnit : MonoBehaviour
 
     public bool IsEnemy()
     {
-        return _isEnemy;
+        return unitData.isEnemy;
     }
 }

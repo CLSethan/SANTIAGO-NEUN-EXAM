@@ -19,6 +19,7 @@ namespace NF.Main.Core.GameStateMachine
             {
                 _turnSystem.SetStateEnemyTurn();
             }
+
             else
             {
                 _turnSystem.SetStatePlayerTurn();

@@ -23,7 +23,7 @@ namespace NF.Main.Core.GameStateMachine
 
         public override void Update()
         {
-            if(_turnSystem.IsPlayerTurn())
+            if (_turnSystem.GetCurrentState() == TurnState.PlayerTurn)
             {
                 return;
             }
@@ -42,10 +42,12 @@ namespace NF.Main.Core.GameStateMachine
                 _turnSystem.SetStateBusy();
             }
 
+            //all enemies finished possible actions
             else
             {
                 _turnSystem.NextTurn();
-                _turnSystem.SetStatePlayerTurn();
+                // idk if this should be handled by TurnSystem or if enemy turn should transition to player turn
+                //_turnSystem.SetStatePlayerTurn();
 
             }
 
@@ -124,6 +126,7 @@ namespace NF.Main.Core.GameStateMachine
         {
             base.OnExit();
             Debug.Log("Enemy Turn Finished");
+
         }
     }
 }

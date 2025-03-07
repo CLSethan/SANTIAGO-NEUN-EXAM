@@ -707,9 +707,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc916ffb1c3a3384e8554a90fcb1b6ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _actionPoints: 3
-  _maxActionPoints: 3
-  _isEnemy: 0
+  unitData: {fileID: 11400000, guid: 7eab3d518d18ed54193f3384dcb1d9f0, type: 2}
 --- !u!114 &6356224770722049357
 MonoBehaviour:
   m_ObjectHideFlags: 0

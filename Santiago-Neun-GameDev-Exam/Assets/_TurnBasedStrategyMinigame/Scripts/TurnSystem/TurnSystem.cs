@@ -68,12 +68,14 @@ namespace NF.Main.Gameplay
         {
             if (_isPlayerTurn)
             {
-                _turnNumber++;
+                _isPlayerTurn = false;
                 SetStateEnemyTurn();
             }
 
             else
             {
+                _turnNumber++;
+                _isPlayerTurn = true;
                 SetStatePlayerTurn();
             }
 
