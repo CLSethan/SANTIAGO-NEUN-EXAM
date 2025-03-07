@@ -7,7 +7,7 @@ namespace NF.Main.Gameplay
     {
         public GameState GameState;
 
-        private StateMachine _stateMachine;
+        public StateMachine _stateMachine;
         
         private void Awake()
         {
@@ -38,9 +38,10 @@ namespace NF.Main.Gameplay
 
 
             // Define transitions
-            At(playingState, pausedState, new FuncPredicate(() => GameState == GameState.Paused));
+            At(playingState, pausedState, new FuncPredicate(() => GameState == GameState.Paused));            
             At(playingState, gameOverState, new FuncPredicate(() => GameState == GameState.GameOver));
-            
+
+
             Any(playingState, new FuncPredicate(() => GameState == GameState.Playing));
 
             // Set initial state

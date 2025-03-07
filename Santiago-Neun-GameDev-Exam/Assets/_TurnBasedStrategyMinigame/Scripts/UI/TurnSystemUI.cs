@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using NF.Main.Gameplay;
 
 public class TurnSystemUI : MonoBehaviour
 {
