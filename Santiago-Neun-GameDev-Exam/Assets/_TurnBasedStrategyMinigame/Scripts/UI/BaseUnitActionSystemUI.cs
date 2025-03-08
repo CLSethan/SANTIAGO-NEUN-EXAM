@@ -4,8 +4,9 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
 using NF.Main.Gameplay;
+using NF.Main.Core;
 
-public class BaseUnitActionSystemUI : MonoBehaviour
+public class BaseUnitActionSystemUI : MonoExt
 {
     [SerializeField]
     private GameObject _actionButtonPrefab;
@@ -19,22 +20,26 @@ public class BaseUnitActionSystemUI : MonoBehaviour
     private void Awake()
     {
         _actionButtonUIList = new List<ActionButtonUI>();
-
-        
     }
 
     private void Start()
     {
-        //subscribe to Events
-        BaseUnitActionSystem.Instance.OnSelectedUnitChanged += PlayerUnitActionSystem_OnSelectedUnitChanged;
-        BaseUnitActionSystem.Instance.OnSelectedActionChanged += PlayerUnitActionSystem_OnSelectedActionChanged;
-        BaseUnitActionSystem.Instance.OnActionStarted += PlayerUnitActionSystem_OnActionStarted;
-        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        BaseUnit.OnAnyActionPointsChanged += PlayerUnit_OnAnyActionPointsChanged;
+        Initialize();
 
-        CreateUnitActionButtons();
-        UpdateSelectedVisual();
-        UpdateAPText();
+        OnSubscriptionSet();
+        UpdateUI();
+    }
+
+    public override void OnSubscriptionSet()
+    {
+        base.OnSubscriptionSet();
+
+        AddEvent(BaseUnitActionSystem.Instance.OnSelectedUnitChanged, _ => UpdateUI());
+        AddEvent(BaseUnitActionSystem.Instance.OnSelectedActionChanged, _ => UpdateSelectedVisual());
+        AddEvent(BaseUnitActionSystem.Instance.OnActionStarted, _ => UpdateAPText());
+        AddEvent(BaseUnit.OnAnyActionPointsChanged, _ => UpdateAPText());
+        AddEvent(TurnSystem.Instance.OnTurnChanged, _ => UpdateAPText());
+
     }
 
     private void CreateUnitActionButtons()
@@ -63,32 +68,12 @@ public class BaseUnitActionSystemUI : MonoBehaviour
         }
     }
 
-    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
-    {
-        UpdateAPText();
-    }
-
-    private void PlayerUnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs e)
+    private void UpdateUI()
     {
         CreateUnitActionButtons();
         UpdateSelectedVisual();
         UpdateAPText();
     }
-
-    private void PlayerUnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
-    {
-        UpdateSelectedVisual();
-    }
-
-    private void PlayerUnitActionSystem_OnActionStarted(object sender, EventArgs e)
-    {
-        UpdateAPText();
-    }
-    private void PlayerUnit_OnAnyActionPointsChanged(object sender, EventArgs e)
-    {
-        UpdateAPText();
-    }
-
 
     private void UpdateSelectedVisual()
     {

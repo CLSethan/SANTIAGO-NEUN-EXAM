@@ -6,7 +6,7 @@ namespace NF.Main.Core.GameStateMachine
 {
     public class EnemyTurn : TurnSystemBaseState
     {
-        public static event Action<Action> OnEnemyTurnStart;
+        //public static event Action<Action> OnEnemyTurnStart;
 
         private float _timer;
 

@@ -1,6 +1,7 @@
 using NF.Main.Core;
 using System;
 using NF.Main.Core.GameStateMachine;
+using UniRx;
 
 namespace NF.Main.Gameplay
 {
@@ -8,7 +9,9 @@ namespace NF.Main.Gameplay
     {
         public TurnState TurnState;
         public StateMachine _stateMachine;
-        public event EventHandler OnTurnChanged;
+        //public event EventHandler OnTurnChanged;
+
+        public Subject<Unit> OnTurnChanged;
 
         private int _turnNumber = 1;
         private bool _isPlayerTurn = true;
@@ -16,8 +19,9 @@ namespace NF.Main.Gameplay
         private void Awake()
         {
             Initialize();
-            Instance = this;
 
+            Instance = this;
+            OnTurnChanged = new Subject<Unit>();
         }
 
         private void Update()
@@ -79,7 +83,7 @@ namespace NF.Main.Gameplay
                 SetStatePlayerTurn();
             }
 
-            OnTurnChanged?.Invoke(this, EventArgs.Empty);
+            OnTurnChanged.OnNext(Unit.Default);
         }
 
         public int GetTurnNumber()

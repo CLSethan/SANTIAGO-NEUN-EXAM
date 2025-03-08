@@ -1,11 +1,13 @@
 using UnityEngine;
+using NF.Main.Core;
 
-public class ActionBusyUI : MonoBehaviour
+public class ActionBusyUI : MonoExt
 {
 
     private void Start()
     {
-        BaseUnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
+        Initialize();
+        OnSubscriptionSet();
         Hide();
     }
 
@@ -19,15 +21,15 @@ public class ActionBusyUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void UnitActionSystem_OnBusyChanged(object sender, bool isBusy)
+    public override void OnSubscriptionSet()
     {
-        if(isBusy)
-        {
-            Show();
-        }
-        else
-        {
-            Hide();
-        }
+        base.OnSubscriptionSet();
+        AddEvent(BaseUnitActionSystem.Instance.OnBusyChanged, UnitActionSystem_OnBusyChanged);
+    }
+
+    private void UnitActionSystem_OnBusyChanged(bool isBusy)
+    {
+        if (isBusy) Show();
+        else Hide();
     }
 }

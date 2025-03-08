@@ -1,7 +1,8 @@
+using NF.Main.Core;
 using System;
 using UnityEngine;
 
-public class UnitRagdollSpawner : MonoBehaviour
+public class UnitRagdollSpawner : MonoExt
 {
     [SerializeField]
     private GameObject _unitRagdollPrefab;
@@ -12,10 +13,23 @@ public class UnitRagdollSpawner : MonoBehaviour
     private void Awake()
     {
         _healthSystem = GetComponent<HealthSystem>();
-        _healthSystem.OnDeath += HealthSystem_OnDeath;
     }
 
-    private void HealthSystem_OnDeath(object sender, EventArgs e)
+    private void Start()
+    {
+        Initialize();
+        OnSubscriptionSet();
+    }
+
+    public override void OnSubscriptionSet()
+    {
+        base.OnSubscriptionSet();
+        //subscribe to events
+
+        AddEvent(_healthSystem.OnDeath, _ => SpawnRagdoll());
+
+    }
+    private void SpawnRagdoll()
     {
         GameObject ragdollGO = Instantiate(_unitRagdollPrefab, transform.position, transform.rotation);
         UnitRagdoll unitRagdoll = ragdollGO.GetComponent<UnitRagdoll>();

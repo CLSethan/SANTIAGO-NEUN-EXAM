@@ -1,11 +1,15 @@
 using System;
+using UniRx;
 using UnityEngine;
 
 public class HealthSystem : MonoBehaviour
 {
 
-    public event EventHandler OnDeath;
-    public event EventHandler OnDamaged;
+    //public event EventHandler OnDeath;
+    //public event EventHandler OnDamaged;
+
+    public Subject<Unit> OnDeath = new Subject<Unit>();
+    public Subject<Unit> OnDamaged = new Subject<Unit>();
 
     [SerializeField]
     private int health;
@@ -21,7 +25,7 @@ public class HealthSystem : MonoBehaviour
     {
         health -= damageAmount;
 
-        OnDamaged?.Invoke(this, EventArgs.Empty);
+        OnDamaged.OnNext(Unit.Default);
 
         if (health <= 0)
         {
@@ -32,7 +36,7 @@ public class HealthSystem : MonoBehaviour
 
     private void Die()
     {
-        OnDeath?.Invoke(this, EventArgs.Empty);
+        OnDeath.OnNext(Unit.Default);
     }
 
     public float GetHealthNormalized()

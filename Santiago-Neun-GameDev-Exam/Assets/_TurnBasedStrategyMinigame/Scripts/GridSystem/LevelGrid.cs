@@ -2,12 +2,13 @@ using UnityEngine;
 using System.Collections.Generic;
 using NF.Main.Core;
 using System;
+using UniRx;
 
 
 public class LevelGrid : Singleton<LevelGrid>
 {
 
-    public event EventHandler OnAnyUnitMovedGridPosition;
+    public Subject<GridPosition> OnAnyUnitMovedGridPosition;
 
     private GridSystem<GridObject> _gridSystem;
     [SerializeField]
@@ -23,9 +24,12 @@ public class LevelGrid : Singleton<LevelGrid>
     private void Awake()
     {
         Instance = this;
-
+        // Initialize Grid System
         _gridSystem = new GridSystem<GridObject>(_levelGridWidth, _levelGridHeight, _levelGridCellsize,
                         (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition));
+        // Initialize Events
+        OnAnyUnitMovedGridPosition = new Subject<GridPosition>();
+
         //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
     }
 
@@ -60,7 +64,7 @@ public class LevelGrid : Singleton<LevelGrid>
     {
         RemoveUnitAtGridPosition(fromGridPosition, unit);
         AddUnitAtGridPosition(toGridPosition, unit);
-        OnAnyUnitMovedGridPosition?.Invoke(this, EventArgs.Empty);
+        OnAnyUnitMovedGridPosition.OnNext(toGridPosition); // Emits the event
     }
 
     // get grid position of world position

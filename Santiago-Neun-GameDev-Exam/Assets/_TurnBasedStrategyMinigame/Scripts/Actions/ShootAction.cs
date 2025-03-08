@@ -3,18 +3,26 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UniRx;
 
 public class ShootAction : BaseAction
 {
 
-    public event EventHandler<OnShootEventArgs> OnShoot;
-    public event EventHandler OnStopShooting;
+    public Subject<OnShootEventArgs> OnShoot;
+    public Subject<Unit> OnStopShooting;
 
 
-    public class OnShootEventArgs : EventArgs
+    public class OnShootEventArgs
     {
-        public BaseUnit targetUnit;
-        public BaseUnit shootingUnit;
+        public BaseUnit TargetUnit { get; }
+        public BaseUnit ShootingUnit { get; }
+
+
+        public OnShootEventArgs(BaseUnit targetUnit, BaseUnit shootingUnit)
+        {
+            TargetUnit = targetUnit;
+            ShootingUnit = shootingUnit;
+        }
     }
 
     [SerializeField]
@@ -36,6 +44,13 @@ public class ShootAction : BaseAction
     private bool _canShoot;
 
     private UnitState _state;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        OnShoot = new Subject<OnShootEventArgs>();
+        OnStopShooting = new Subject<Unit>();
+    }
 
 
     private void Update()
@@ -84,7 +99,7 @@ public class ShootAction : BaseAction
                 _stateTimer = _cooloffStateTime;
                 break;
             case UnitState.Cooldown:
-                OnStopShooting?.Invoke(this, EventArgs.Empty);
+                OnStopShooting.OnNext(Unit.Default); // Emit event
                 ActionComplete();
                 break;
         }
@@ -92,11 +107,8 @@ public class ShootAction : BaseAction
 
     private void Shoot()
     {
-        OnShoot?.Invoke(this, new OnShootEventArgs
-        {
-            targetUnit = _targetUnit,
-            shootingUnit = _unit
-        });
+        OnShoot.OnNext(new OnShootEventArgs(_targetUnit, _unit)); // Emit event
+
         _targetUnit.Damage(_damage);
     }
 

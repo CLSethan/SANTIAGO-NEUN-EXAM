@@ -21,16 +21,23 @@ public class UnitManager : Singleton<UnitManager>
 
     private void Start()
     {
-        //subscribe to events
-        BaseUnit.OnAnyUnitSpawned += Unit_OnAnyUnitSpawned;
-        BaseUnit.OnAnyUnitDead += Unit_OnAnyUnitDead;
+        Initialize();
+        OnSubscriptionSet();
     }
 
-    private void Unit_OnAnyUnitSpawned(object sender, EventArgs e)
+    public override void OnSubscriptionSet()
     {
-        BaseUnit unit = sender as BaseUnit;
+        base.OnSubscriptionSet();
+        //subscribe to events
 
+        AddEvent(BaseUnit.OnAnyUnitSpawned, Unit_OnAnyUnitSpawned);
+        AddEvent(BaseUnit.OnAnyUnitDead, Unit_OnAnyUnitDead);
+    }
+
+    private void Unit_OnAnyUnitSpawned(BaseUnit unit)
+    {
         _unitList.Add(unit);
+
         if (unit.IsEnemy())
         {
             _enemyUnitList.Add(unit);
@@ -41,10 +48,8 @@ public class UnitManager : Singleton<UnitManager>
         }
     }
 
-    private void Unit_OnAnyUnitDead(object sender, EventArgs e)
+    private void Unit_OnAnyUnitDead(BaseUnit unit)
     {
-        BaseUnit unit = sender as BaseUnit;
-
         _unitList.Remove(unit);
 
         if (unit.IsEnemy())

@@ -3,6 +3,7 @@ using UnityEngine;
 using NF.Main.Core;
 using UnityEngine.EventSystems;
 using NF.Main.Gameplay;
+using UniRx;
 
 
 public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
@@ -18,15 +19,25 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
     
 
     //event handlers
-    public event EventHandler OnSelectedUnitChanged;
-    public event EventHandler OnSelectedActionChanged;
-    public event EventHandler<bool> OnBusyChanged;
-    public event EventHandler OnActionStarted;
+    //public event EventHandler OnSelectedUnitChanged;
+    //public event EventHandler OnSelectedActionChanged;
+    //public event EventHandler<bool> OnBusyChanged;
+    //public event EventHandler OnActionStarted;
 
+    public Subject<Unit> OnSelectedUnitChanged;
+    public Subject<Unit> OnSelectedActionChanged;
+    public Subject<bool> OnBusyChanged;
+    public Subject<Unit> OnActionStarted;
 
     private void Awake()
     {
         Instance = this;
+
+        // Initialize Events
+        OnSelectedUnitChanged = new Subject<Unit>();
+        OnSelectedActionChanged = new Subject<Unit>();
+        OnActionStarted = new Subject<Unit>();
+        OnBusyChanged = new Subject<bool>();
     }
     private void Start()
     {
@@ -102,7 +113,7 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
                     _selectedAction.TakeAction(mouseGridPosition, ClearBusy);
 
                     //check for event subscribers and fire event
-                    OnActionStarted?.Invoke(this, EventArgs.Empty);
+                    OnActionStarted.OnNext(Unit.Default);
                 }
             }
         }
@@ -146,7 +157,7 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
         }
 
         //check for event subscribers and fire event
-        OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
+        OnSelectedUnitChanged.OnNext(Unit.Default);
     }
 
     // get selected unit
@@ -159,7 +170,7 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
     {
         _selectedAction = baseAction;
         //check for event subscribers and fire event
-        OnSelectedActionChanged?.Invoke(this, EventArgs.Empty);
+        OnSelectedActionChanged.OnNext(Unit.Default);
 
     }
     public BaseAction GetSelectedAction()
@@ -171,7 +182,7 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
     {
         _isBusy = true;
         //check for event subscribers and fire event
-        OnBusyChanged?.Invoke(this, _isBusy);
+        OnBusyChanged.OnNext(_isBusy);
 
     }
 
@@ -179,8 +190,8 @@ public class BaseUnitActionSystem : Singleton<BaseUnitActionSystem>
     {
         _isBusy = false;
         //check for event subscribers and fire event
-        OnBusyChanged?.Invoke(this, _isBusy);
+        OnBusyChanged.OnNext(_isBusy);
     }
 
-    
+
 }

@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using NF.Main.Gameplay;
+using NF.Main.Core;
 
-public class TurnSystemUI : MonoBehaviour
+public class TurnSystemUI : MonoExt
 {
     [SerializeField]
     private Button _endTurnButton;
@@ -15,18 +16,26 @@ public class TurnSystemUI : MonoBehaviour
 
     private void Start()
     {
+
+        Initialize();
+        OnSubscriptionSet();
+
         _endTurnButton.onClick.AddListener(() =>
         {
             TurnSystem.Instance.NextTurn();
         });
 
-        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        UpdateTurnText();
-        UpdateEnemyTurnVisual();
-        UpdateEndTurnButton();
+        UpdateTurnSystemUI();
     }
 
-    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    public override void OnSubscriptionSet()
+    {
+        base.OnSubscriptionSet();
+
+        AddEvent(TurnSystem.Instance.OnTurnChanged, _ => UpdateTurnSystemUI());
+    }
+
+    private void UpdateTurnSystemUI()
     {
         UpdateTurnText();
         UpdateEnemyTurnVisual();

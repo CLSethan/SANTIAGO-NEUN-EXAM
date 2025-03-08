@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 public class MoveAction : BaseAction
 {
 
-    public event EventHandler OnStartMoving;
-    public event EventHandler OnStopMoving;
-
+    public Subject<Unit> OnStartMoving;
+    public Subject<Unit> OnStopMoving;
 
 
     //movement variables
@@ -22,6 +22,13 @@ public class MoveAction : BaseAction
 
     private List<Vector3> positionList;
     private int currentPositionIndex;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        OnStartMoving = new Subject<Unit>();
+        OnStopMoving = new Subject<Unit>();
+    }
 
     private void Update()
     {
@@ -48,7 +55,7 @@ public class MoveAction : BaseAction
             if (currentPositionIndex >= positionList.Count)
             {
                 //reached end of movement
-                OnStopMoving?.Invoke(this, EventArgs.Empty);
+                OnStopMoving.OnNext(Unit.Default);
                 ActionComplete();
             }
 
@@ -67,7 +74,7 @@ public class MoveAction : BaseAction
             positionList.Add(LevelGrid.Instance.GetWorldPosition(pathGridPosition));
         }
 
-        OnStartMoving?.Invoke(this, EventArgs.Empty);
+        OnStartMoving.OnNext(Unit.Default);
         ActionStart(onActionComplete);
     }
 
@@ -144,4 +151,6 @@ public class MoveAction : BaseAction
     {
         return "Move";
     }
+
+    
 }

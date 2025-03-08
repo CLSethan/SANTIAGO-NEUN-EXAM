@@ -36,22 +36,32 @@ public class GridSystemVisual : Singleton<GridSystemVisual>
 
     private void Start()
     {
+        Initialize();
+
         _gridSystemVisualSingleArray = new GridSystemVisualSingle[LevelGrid.Instance.GetWidth(), LevelGrid.Instance.GetHeight()];
 
         // Create visuals along the grid
-        for(int x = 0; x < LevelGrid.Instance.GetWidth(); x++)
+        for (int x = 0; x < LevelGrid.Instance.GetWidth(); x++)
         {
             for (int z = 0; z < LevelGrid.Instance.GetHeight(); z++)
             {
-                GridPosition gridPosition = new GridPosition(x,z);
+                GridPosition gridPosition = new GridPosition(x, z);
                 GameObject gridVisualiserGO = Instantiate(_gridVisualiserSinglePrefab, LevelGrid.Instance.GetWorldPosition(gridPosition), Quaternion.identity);
 
                 _gridSystemVisualSingleArray[x, z] = gridVisualiserGO.GetComponent<GridSystemVisualSingle>();
             }
         }
 
-        BaseUnitActionSystem.Instance.OnSelectedActionChanged += BaseUnitActionSystem_OnSelectedActionChanged;
-        LevelGrid.Instance.OnAnyUnitMovedGridPosition += LevelGrid_OnAnyUnitMovedGridPosition;
+        OnSubscriptionSet();
+    }
+
+    public override void OnSubscriptionSet()
+    {
+        base.OnSubscriptionSet();
+
+        // Subscribe to events using MonoExt's AddEvent method
+        AddEvent(LevelGrid.Instance.OnAnyUnitMovedGridPosition, _ => UpdateGridVisual());
+        AddEvent(BaseUnitActionSystem.Instance.OnSelectedActionChanged, _ => UpdateGridVisual());
 
     }
 

@@ -1,28 +1,27 @@
 using System;
 using UnityEngine;
+using UniRx;
+using NF.Main.Core;
 
-public class UnitSelectedVisual : MonoBehaviour
+public class UnitSelectedVisual : MonoExt
 {
     [SerializeField]
     private BaseUnit _unit;
     private MeshRenderer _meshRenderer;
 
-    private void Awake()
+    public override void Initialize(object data = null)
     {
+        base.Initialize(data);
         _meshRenderer = GetComponent<MeshRenderer>();
+        OnSubscriptionSet();
+        UpdateVisual();
+
     }
 
-    private void Start()
+    public override void OnSubscriptionSet()
     {
-        //listen to onselectedunitchanged event
-        BaseUnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
-
-        UpdateVisual();
-    }
-
-    private void UnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs empty)
-    {
-        UpdateVisual();
+        base.OnSubscriptionSet();
+        AddEvent(BaseUnitActionSystem.Instance.OnSelectedUnitChanged, _ => UpdateVisual());
     }
 
     private void UpdateVisual()
@@ -35,10 +34,5 @@ public class UnitSelectedVisual : MonoBehaviour
         {
             _meshRenderer.enabled = false;
         }
-    }
-
-    private void OnDestroy()
-    {
-        BaseUnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
     }
 }

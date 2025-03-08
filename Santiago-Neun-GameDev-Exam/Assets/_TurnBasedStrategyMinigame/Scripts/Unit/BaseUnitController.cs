@@ -3,6 +3,7 @@ using UnityEngine;
 using NF.Main.Core;
 using NF.Main.Core.PlayerStateMachine;
 using NF.Main.Core.GameStateMachine;
+using UniRx;
 
 
 public class BaseUnitController : MonoExt 
@@ -20,23 +21,16 @@ public class BaseUnitController : MonoExt
 
     private void Awake()    
     {
-        SetupStateMachine();
+        //SetupStateMachine();
     }
 
-    private void ShootAction_OnShoot(object sender, ShootAction.OnShootEventArgs e)
+    private void Start()
     {
-        _unitAnimator.SetTrigger("Shoot");
+        Initialize();
+        SetupStateMachine();
 
-        GameObject bulletProjectileGO = Instantiate(_bulletProjectilePrefab, _shootPoint.position, Quaternion.identity);
-        BulletProjectile bulletProjectile = bulletProjectileGO.GetComponent<BulletProjectile>();
-
-        //shoot at same level as shoot point
-        Vector3 targetUnitShootAtPoint = e.targetUnit.GetWorldPosition();
-        targetUnitShootAtPoint.y = _shootPoint.position.y;
-
-        bulletProjectile.Setup(targetUnitShootAtPoint);
     }
-    
+
     private void SetupStateMachine()
     {
         _stateMachine = new StateMachine();
@@ -57,19 +51,19 @@ public class BaseUnitController : MonoExt
 
         if (TryGetComponent<MoveAction>(out MoveAction moveAction))
         {
-            moveAction.OnStartMoving += (s, e) => _stateMachine.SetState(walkingState);
-            moveAction.OnStopMoving += (s, e) => _stateMachine.SetState(idleState);
+            AddEvent(moveAction.OnStartMoving, _ => _stateMachine.SetState(walkingState));
+            AddEvent(moveAction.OnStopMoving, _ => _stateMachine.SetState(idleState));
         }
 
         if (TryGetComponent<ShootAction>(out ShootAction shootAction))
         {
-            shootAction.OnShoot += (s, e) =>
+            AddEvent<ShootAction.OnShootEventArgs>(shootAction.OnShoot, (e) =>
             {
-                shootingState.SetTarget(e.targetUnit);
+                shootingState.SetTarget(e.TargetUnit);
                 _stateMachine.SetState(shootingState);
-            };
+            });
 
-            shootAction.OnStopShooting += (s, e) => _stateMachine.SetState(idleState);
+            AddEvent(shootAction.OnStopShooting, (e) => _stateMachine.SetState(idleState));
         }
 
 

@@ -2,8 +2,9 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using NF.Main.Core;
 
-public class UnitWorldUI : MonoBehaviour
+public class UnitWorldUI : MonoExt
 {
     [SerializeField] 
     private TextMeshProUGUI _actionPointsText;
@@ -16,12 +17,22 @@ public class UnitWorldUI : MonoBehaviour
 
     private void Start()
     {
-        //subscribe to events
-        BaseUnit.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
-        _healthSystem.OnDamaged += HealthSystem_OnDamaged;
+
+        Initialize();
+        OnSubscriptionSet();
 
         UpdateActionPointsText();
         UpdateHealthBar();
+    }
+
+    public override void OnSubscriptionSet()
+    {
+        base.OnSubscriptionSet();
+        //subscribe to events
+
+        AddEvent(BaseUnit.OnAnyActionPointsChanged, _ => UpdateActionPointsText());
+        AddEvent(_healthSystem.OnDamaged, _ => UpdateHealthBar());
+
     }
 
     private void UpdateActionPointsText()
@@ -29,19 +40,8 @@ public class UnitWorldUI : MonoBehaviour
         _actionPointsText.text = _unit.GetActionPoints().ToString();
     }
 
-    private void Unit_OnAnyActionPointsChanged(object sender, EventArgs e)
-    {
-        UpdateActionPointsText();
-    }
-
     private void UpdateHealthBar()
     {
         _healthBarImage.fillAmount = _healthSystem.GetHealthNormalized();
     }
-
-    private void HealthSystem_OnDamaged(object sender, EventArgs e)
-    {
-        UpdateHealthBar();
-    }
-
 }

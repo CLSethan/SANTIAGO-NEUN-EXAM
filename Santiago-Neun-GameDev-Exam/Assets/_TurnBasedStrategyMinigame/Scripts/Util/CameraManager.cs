@@ -1,23 +1,30 @@
 using System;
 using UnityEngine;
+using UniRx;
+using NF.Main.Core;
 
-public class CameraManager : MonoBehaviour
+public class CameraManager : MonoExt
 {
-    [SerializeField] 
+    [SerializeField]
     private GameObject _actionCameraGameObject;
     [SerializeField]
     private float _characterHeight = 1.7f;
     [SerializeField]
-    float _shoulderOffset = 0.5f;
+    private float _shoulderOffset = 0.5f;
 
     private void Start()
     {
-        //subscribe to events
-        BaseAction.OnAnyActionStarted += BaseAction_OnAnyActionStarted;
-        BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
-
+        Initialize();
+        OnSubscriptionSet();
         HideActionCamera();
     }
+
+    public override void OnSubscriptionSet()
+    {
+        AddEvent(BaseAction.OnAnyActionStarted, OnActionStarted);
+        AddEvent(BaseAction.OnAnyActionCompleted, OnActionCompleted);
+    }
+
 
     private void ShowActionCamera()
     {
@@ -29,44 +36,36 @@ public class CameraManager : MonoBehaviour
         _actionCameraGameObject.SetActive(false);
     }
 
-    private void BaseAction_OnAnyActionStarted(object sender, EventArgs e)
+    private void OnActionStarted(BaseAction action)
     {
-        // switch on action
-        switch (sender)
+        if (action is ShootAction shootAction)
         {
+            // Get shooter and target
+            BaseUnit shooterUnit = shootAction.GetUnit();
+            BaseUnit targetUnit = shootAction.GetTargetUnit();
 
-            case ShootAction shootAction:
+            // Adjust for character height
+            Vector3 cameraCharacterHeight = Vector3.up * _characterHeight;
+            Vector3 shootDir = (targetUnit.GetWorldPosition() - shooterUnit.GetWorldPosition()).normalized;
 
-                //get shooter and target
-                BaseUnit shooterUnit = shootAction.GetUnit();
-                BaseUnit targetUnit = shootAction.GetTargetUnit();
+            // Create shoulder offset
+            Vector3 shoulderOffset = Quaternion.Euler(0, 90, 0) * shootDir * _shoulderOffset;
+            Vector3 actionCameraPosition = shooterUnit.GetWorldPosition() + cameraCharacterHeight + shoulderOffset + (shootDir * -1);
 
-                //adjust for character height
-                Vector3 cameraCharacterHeight = Vector3.up * _characterHeight;
-                Vector3 shootDir = (targetUnit.GetWorldPosition() - shooterUnit.GetWorldPosition()).normalized;
+            // Move action camera
+            _actionCameraGameObject.transform.position = actionCameraPosition;
+            _actionCameraGameObject.transform.LookAt(targetUnit.GetWorldPosition() + cameraCharacterHeight);
 
-                //create offset
-                Vector3 shoulderOffset = Quaternion.Euler(0, 90, 0) * shootDir * _shoulderOffset;
-                Vector3 actionCameraPosition = shooterUnit.GetWorldPosition() + cameraCharacterHeight + shoulderOffset + (shootDir * -1);
-
-                //move action camera and adjust for character height
-                _actionCameraGameObject.transform.position = actionCameraPosition;
-                _actionCameraGameObject.transform.LookAt(targetUnit.GetWorldPosition() + cameraCharacterHeight);
-
-                //show camera
-                ShowActionCamera();
-                break;
+            // Show camera
+            ShowActionCamera();
         }
     }
 
-    private void BaseAction_OnAnyActionCompleted(object sender, EventArgs e)
+    private void OnActionCompleted(BaseAction action)
     {
-        switch (sender)
+        if (action is ShootAction)
         {
-            case ShootAction shootAction:
-                HideActionCamera();
-                break;
+            HideActionCamera();
         }
     }
-
 }

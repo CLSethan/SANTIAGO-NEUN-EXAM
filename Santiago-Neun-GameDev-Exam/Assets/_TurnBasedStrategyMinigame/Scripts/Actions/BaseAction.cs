@@ -1,12 +1,13 @@
+using NF.Main.Core;
 using System;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
-public abstract class BaseAction : MonoBehaviour
+public abstract class BaseAction : MonoExt
 {
-
-    public static event EventHandler OnAnyActionStarted;
-    public static event EventHandler OnAnyActionCompleted;
+    public static readonly Subject<BaseAction> OnAnyActionStarted = new Subject<BaseAction>();
+    public static readonly Subject<BaseAction> OnAnyActionCompleted = new Subject<BaseAction>();
 
     protected BaseUnit _unit;
     protected bool _isActive;
@@ -18,6 +19,7 @@ public abstract class BaseAction : MonoBehaviour
     {
         _unit = GetComponent<BaseUnit>();
     }
+
 
     public EnemyAIAction GetBestEnemyAIAction()
     {
@@ -74,7 +76,8 @@ public abstract class BaseAction : MonoBehaviour
     {
         _isActive = true;
         this._onActionComplete = onActionComplete;
-        OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
+
+        OnAnyActionStarted.OnNext(this);
 
     }
 
@@ -83,7 +86,8 @@ public abstract class BaseAction : MonoBehaviour
     {
         _isActive = false;
         _onActionComplete();
-        OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
+
+        OnAnyActionCompleted.OnNext(this);
 
     }
 

@@ -2,8 +2,11 @@ using NF.Main.Core.GameStateMachine;
 using System;
 using UnityEngine;
 using NF.Main.Gameplay;
+using UniRx;
+using NF.Main.Core;
 
-public class BaseUnit : MonoBehaviour
+
+public class BaseUnit : MonoExt
 {
     [SerializeField] private UnitData unitData;
 
@@ -12,9 +15,9 @@ public class BaseUnit : MonoBehaviour
     private BaseAction[] _baseActionArray;
 
     //unit events
-    public static event EventHandler OnAnyActionPointsChanged;
-    public static event EventHandler OnAnyUnitSpawned;
-    public static event EventHandler OnAnyUnitDead;
+    public static Subject<Unit> OnAnyActionPointsChanged;
+    public static readonly Subject<BaseUnit> OnAnyUnitSpawned = new Subject<BaseUnit>();
+    public static readonly Subject<BaseUnit> OnAnyUnitDead = new Subject<BaseUnit>();
 
     private int _actionPoints;
     private int _currentHealth;
@@ -26,17 +29,29 @@ public class BaseUnit : MonoBehaviour
 
         _actionPoints = unitData.maxActionPoints;
         _currentHealth = unitData.maxHealth;
+        OnAnyActionPointsChanged = new Subject<Unit>();
     }
 
     private void Start()
     {
+        Initialize();
+        OnSubscriptionSet();
+
         _gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         LevelGrid.Instance.AddUnitAtGridPosition(_gridPosition, this);
 
         //subscribe to events
-        TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged;
-        _healthSystem.OnDeath += HealthSystem_OnDeath;
-        OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
+        OnAnyUnitSpawned.OnNext(this);
+    }
+
+
+    public override void OnSubscriptionSet()
+    {
+        base.OnSubscriptionSet();
+        //subscribe to events
+
+        AddEvent(_healthSystem.OnDeath, _ => HealthSystem_OnDeath());
+        AddEvent(TurnSystem.Instance.OnTurnChanged, _ => TurnSystem_OnTurnChanged());
 
     }
 
@@ -92,25 +107,27 @@ public class BaseUnit : MonoBehaviour
     private void SpendAP(int amount)
     {
         _actionPoints -= amount;
-        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        OnAnyActionPointsChanged.OnNext(Unit.Default);
+
     }
 
     // reset action points on next turn
-    private void TurnSystem_OnTurnChanged(object sender, EventArgs e)
+    private void TurnSystem_OnTurnChanged()
     {
         if((IsEnemy() && !TurnSystem.Instance.IsPlayerTurn()) || !IsEnemy() && TurnSystem.Instance.IsPlayerTurn())
         {
             _actionPoints = unitData.maxActionPoints;
-            OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+            OnAnyActionPointsChanged.OnNext(Unit.Default);
         }
     }
 
-    private void HealthSystem_OnDeath(object sender, EventArgs e)
+    private void HealthSystem_OnDeath()
     {
         // cleanup grid and destroy gameobject
+        Debug.Log("Destroying Unit");
         LevelGrid.Instance.RemoveUnitAtGridPosition(_gridPosition, this);
         Destroy(gameObject);
-        OnAnyUnitDead?.Invoke(this, EventArgs.Empty);
+        OnAnyUnitDead.OnNext(this);
     }
 
     public T GetAction<T>() where T : BaseAction
