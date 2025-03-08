@@ -8,6 +8,8 @@ public class ShootAction : BaseAction
 {
 
     public event EventHandler<OnShootEventArgs> OnShoot;
+    public event EventHandler OnStopShooting;
+
 
     public class OnShootEventArgs : EventArgs
     {
@@ -33,7 +35,7 @@ public class ShootAction : BaseAction
     private BaseUnit _targetUnit;
     private bool _canShoot;
 
-    private PlayerState _state;
+    private UnitState _state;
 
 
     private void Update()
@@ -47,19 +49,19 @@ public class ShootAction : BaseAction
 
         switch(_state)
         {
-            case PlayerState.Aiming:
+            case UnitState.Aiming:
                 Vector3 AimDir = (_targetUnit.GetWorldPosition() - _unit.GetWorldPosition()).normalized;
                 float _rotateSpeed = 10f;
                 transform.forward = Vector3.Lerp(transform.forward, AimDir, _rotateSpeed * Time.deltaTime);
                 break;
-            case PlayerState.Shooting:
+            case UnitState.Shooting:
                 if(_canShoot)
                 {
                     Shoot();
                     _canShoot = false;
                 }
                 break;
-            case PlayerState.Cooloff:
+            case UnitState.Cooldown:
                 break;
         }
 
@@ -73,15 +75,16 @@ public class ShootAction : BaseAction
     {
         switch (_state)
         {
-            case PlayerState.Aiming:
-                _state = PlayerState.Shooting;
+            case UnitState.Aiming:
+                _state = UnitState.Shooting;
                 _stateTimer = _shootStateTime;
                 break;
-            case PlayerState.Shooting:
-                _state = PlayerState.Cooloff;
+            case UnitState.Shooting:
+                _state = UnitState.Cooldown;
                 _stateTimer = _cooloffStateTime;
                 break;
-            case PlayerState.Cooloff:
+            case UnitState.Cooldown:
+                OnStopShooting?.Invoke(this, EventArgs.Empty);
                 ActionComplete();
                 break;
         }
@@ -192,7 +195,7 @@ public class ShootAction : BaseAction
     {
         _targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
 
-        _state = PlayerState.Aiming;
+        _state = UnitState.Aiming;
         _stateTimer = _aimingStateTime;
         _canShoot = true;
         ActionStart(onActionComplete);

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PlayerUnitData
   m_EditorClassIdentifier: 
   unitName: PlayerUnit
-  maxActionPoints: 6
+  maxActionPoints: 100
   maxHealth: 100
   isEnemy: 0
