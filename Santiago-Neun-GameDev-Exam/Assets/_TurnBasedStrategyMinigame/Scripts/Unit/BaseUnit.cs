@@ -48,8 +48,8 @@ public class BaseUnit : MonoExt
     public override void OnSubscriptionSet()
     {
         base.OnSubscriptionSet();
-        //subscribe to events
 
+        //subscribe to events
         AddEvent(_healthSystem.OnDeath, _ => HealthSystem_OnDeath());
         AddEvent(TurnSystem.Instance.OnTurnChanged, _ => TurnSystem_OnTurnChanged());
 
@@ -57,16 +57,20 @@ public class BaseUnit : MonoExt
 
     void Update()
     {
+        UpdateGridPosition();
+    }
+
+    private void UpdateGridPosition()
+    {
         //check if unit changed grid position
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
+
         if (newGridPosition != _gridPosition)
         {
             //update grid position
-
             GridPosition oldGridPosition = _gridPosition;
             _gridPosition = newGridPosition;
             LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
-
             _gridPosition = newGridPosition;
         }
     }
@@ -79,29 +83,15 @@ public class BaseUnit : MonoExt
     // check if player can spend action points then decrease it, otherwise return false
     public bool TrySpendAP(BaseAction baseAction)
     {
-        if (CanSpendAP(baseAction))
-        {
-            SpendAP(baseAction.GetActionPointCost());
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        if (!CanSpendAP(baseAction)) return false;
+
+        SpendAP(baseAction.GetActionPointCost());
+        return true;
     }
 
     // check if action points is greater than action cost
-    public bool CanSpendAP(BaseAction baseAction)
-    {
-        if (_actionPoints >= baseAction.GetActionPointCost())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    public bool CanSpendAP(BaseAction action) => _actionPoints >= action.GetActionPointCost();
+
 
     // decrease action points
     private void SpendAP(int amount)
@@ -142,32 +132,15 @@ public class BaseUnit : MonoExt
         return null;
     }
 
-    public Vector3 GetWorldPosition()
-    {
-        return transform.position;
-    }
-    public GridPosition GetGridPosition()
-    {
-        return _gridPosition;
-    }
+    public Vector3 GetWorldPosition() => transform.position;
 
-    public BaseAction[] GetBaseActionArray()
-    {
-        return _baseActionArray;
-    }
+    public GridPosition GetGridPosition() => _gridPosition;
 
-    public int GetActionPoints()
-    {
-        return _actionPoints;
-         
-    }
-    public float GetHealthNormalized()
-    {
-        return _healthSystem.GetHealthNormalized();
-    }
+    public BaseAction[] GetBaseActionArray() => _baseActionArray;
 
-    public bool IsEnemy()
-    {
-        return unitData.isEnemy;
-    }
+    public int GetActionPoints() => _actionPoints;
+
+    public float GetHealthNormalized() => _healthSystem.GetHealthNormalized();
+
+    public bool IsEnemy() => unitData.isEnemy;
 }

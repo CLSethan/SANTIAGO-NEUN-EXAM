@@ -14,7 +14,6 @@ namespace NF.Main.Core.GameStateMachine
         {
             base.OnEnter();
             Debug.Log("Player's Turn!");
-
         }
 
         public override void OnExit()

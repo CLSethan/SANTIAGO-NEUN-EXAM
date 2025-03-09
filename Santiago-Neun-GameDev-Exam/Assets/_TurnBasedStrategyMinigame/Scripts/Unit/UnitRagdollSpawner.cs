@@ -25,7 +25,6 @@ public class UnitRagdollSpawner : MonoExt
     {
         base.OnSubscriptionSet();
         //subscribe to events
-
         AddEvent(_healthSystem.OnDeath, _ => SpawnRagdoll());
 
     }

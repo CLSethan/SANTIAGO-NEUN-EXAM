@@ -15,20 +15,19 @@ namespace NF.Main.Core.PlayerStateMachine
             _animator.CrossFade(WalkingHash, 0f);
 
             //Use this for transitioning between different animator hashes
-            Debug.Log("Unit is Walking");
+            Debug.Log("Unit Entered Walking");
         }
 
         public override void Update()
         {
             base.Update();
-           // Debug.Log("Player is Idling");
+           Debug.Log("Unit is Walking");
         }
 
         public override void OnExit()
         {
             base.OnExit();
-            //Debug.Log("Exiting Player Idle State");
-            //_animator.CrossFade(AimingHash, 0f);
+            Debug.Log("Unit Finished Walking");
 
         }
     }

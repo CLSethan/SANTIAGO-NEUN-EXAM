@@ -10,10 +10,9 @@ public class GridSystem<TGridObject>
 
    public GridSystem(int width, int height, float cellSize, Func<GridSystem<TGridObject>, GridPosition, TGridObject> createGridObject)
     {
-        this._width = width;
-        this._height = height;
-        this._cellSize = cellSize;
-
+        _width = width;
+        _height = height;
+        _cellSize = cellSize;
         _gridObjectArray = new TGridObject[width, height];
 
         //cycle through width and height
@@ -21,15 +20,14 @@ public class GridSystem<TGridObject>
         {
             for (int z = 0; z < height; z++)
             {
-                //Debug.DrawLine(GetWorldPosition(x, z), GetWorldPosition(x, z) + Vector3.right * .2f, Color.red, 1000);
                 GridPosition gridPosition = new GridPosition(x, z);
                 //create and store gridobjects
                 _gridObjectArray[x, z] =  createGridObject(this, gridPosition);
             }
         }
     }
-    //convert grid position to world position
 
+    //convert grid position to world position
     public Vector3 GetWorldPosition(GridPosition gridPosition)
     {
         return new Vector3(gridPosition.x, 0, gridPosition.z) * _cellSize;
@@ -41,6 +39,7 @@ public class GridSystem<TGridObject>
         return new GridPosition(Mathf.RoundToInt(worldPosition.x / _cellSize), Mathf.RoundToInt(worldPosition.z / _cellSize));
     }
 
+    // Create debug objects for each grid cell
     public void CreateDebugObjects(GameObject debugPrefab)
     {
         for (int x = 0; x < _width; x++)
@@ -55,27 +54,19 @@ public class GridSystem<TGridObject>
             }
         }
     }
-    // get gameobjects inside their current gridposition
+
+    // get the grid object at a given grid position
     public TGridObject GetGridObject(GridPosition gridPosition)
     {
         return _gridObjectArray[gridPosition.x, gridPosition.z];
     }
+
     // check if selected grid position is within bounds
     public bool IsValidGridPosition(GridPosition gridPosition)
     {
-        return gridPosition.x >= 0 && 
-            gridPosition.z >= 0 && 
-            gridPosition.x < _width && 
-            gridPosition.z < _height;
+        return gridPosition.x >= 0 && gridPosition.z >= 0 && 
+            gridPosition.x < _width && gridPosition.z < _height;
     }
-
-    public int GetWidth()
-    {
-        return _width;
-    }
-
-    public int GetHeight()
-    {
-        return _height;
-    }
+    public int GetWidth() => _width;
+    public int GetHeight() => _height;
 }

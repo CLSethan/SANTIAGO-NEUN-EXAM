@@ -6,6 +6,7 @@ using UnityEngine;
 
 public abstract class BaseAction : MonoExt
 {
+    // create Subject Events
     public static readonly Subject<BaseAction> OnAnyActionStarted = new Subject<BaseAction>();
     public static readonly Subject<BaseAction> OnAnyActionCompleted = new Subject<BaseAction>();
 
@@ -15,11 +16,16 @@ public abstract class BaseAction : MonoExt
     //use delegate to clear unit actions
     protected Action _onActionComplete;
 
+    [SerializeField]
+    protected int _actionPoint;
+    [SerializeField]
+    protected string _actionName;
+
+
     protected virtual void Awake()
     {
         _unit = GetComponent<BaseUnit>();
     }
-
 
     public EnemyAIAction GetBestEnemyAIAction()
     {
@@ -37,7 +43,7 @@ public abstract class BaseAction : MonoExt
         // sort enemy actions based on action value
         if (enemyAIActionList.Count > 0)
         {
-            enemyAIActionList.Sort((EnemyAIAction a, EnemyAIAction b) => b.actionValue - a.actionValue);
+            enemyAIActionList.Sort((a, b) => b.actionValue - a.actionValue);
             return enemyAIActionList[0];
         }
 
@@ -49,11 +55,9 @@ public abstract class BaseAction : MonoExt
 
     }
 
+    //Retrieves the AI action associated with a specific grid position.
     public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
-    
-    // return action name
-    public abstract string GetActionName();
-    
+
     // Action Behaviour
     public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete);
 
@@ -63,22 +67,18 @@ public abstract class BaseAction : MonoExt
         List<GridPosition> validGridPositionList = GetValidActionGridPositionList();
         return validGridPositionList.Contains(gridPosition);
     }
+
     // get valid positions to conduct action
     public abstract List<GridPosition> GetValidActionGridPositionList();
-
-    public virtual int GetActionPointCost()
-    {
-        return 1;
-    }
 
     // call on any take action function
     protected void ActionStart(Action onActionComplete)
     {
         _isActive = true;
-        this._onActionComplete = onActionComplete;
+        _onActionComplete = onActionComplete;
 
+        // notify all subscribers that an action has started
         OnAnyActionStarted.OnNext(this);
-
     }
 
     //clear actions
@@ -86,15 +86,16 @@ public abstract class BaseAction : MonoExt
     {
         _isActive = false;
         _onActionComplete();
-
+        // notify all subscribers that an action has completed
         OnAnyActionCompleted.OnNext(this);
-
     }
 
-    public BaseUnit GetUnit()
-    {
-        return _unit;
-    }
+    // return action name
+    public string GetActionName() => _actionName;
 
+    // return AP cost
+    public virtual int GetActionPointCost() => _actionPoint;
 
+    //return unit
+    public BaseUnit GetUnit() => _unit;
 }

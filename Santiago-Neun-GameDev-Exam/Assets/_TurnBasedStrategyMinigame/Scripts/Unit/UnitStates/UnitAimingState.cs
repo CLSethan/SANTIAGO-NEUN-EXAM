@@ -20,13 +20,13 @@ namespace NF.Main.Core.PlayerStateMachine
         public override void Update()
         {
             base.Update();
-           // Debug.Log("Player is Idling");
+            Debug.Log("Player is Idling");
         }
 
         public override void OnExit()
         {
             base.OnExit();
-           // Debug.Log("Exiting Player Idle State");
+            Debug.Log("Exiting Player Idle State");
         }
     }
 }

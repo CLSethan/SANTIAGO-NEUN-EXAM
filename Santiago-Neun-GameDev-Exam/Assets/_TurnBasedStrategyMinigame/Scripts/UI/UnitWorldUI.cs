@@ -20,7 +20,6 @@ public class UnitWorldUI : MonoExt
 
         Initialize();
         OnSubscriptionSet();
-
         UpdateActionPointsText();
         UpdateHealthBar();
     }
@@ -29,7 +28,6 @@ public class UnitWorldUI : MonoExt
     {
         base.OnSubscriptionSet();
         //subscribe to events
-
         AddEvent(BaseUnit.OnAnyActionPointsChanged, _ => UpdateActionPointsText());
         AddEvent(_healthSystem.OnDamaged, _ => UpdateHealthBar());
 

@@ -15,7 +15,6 @@ public class UnitSelectedVisual : MonoExt
         _meshRenderer = GetComponent<MeshRenderer>();
         OnSubscriptionSet();
         UpdateVisual();
-
     }
 
     public override void OnSubscriptionSet()

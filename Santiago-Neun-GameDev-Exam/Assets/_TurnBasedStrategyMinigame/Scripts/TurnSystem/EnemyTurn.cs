@@ -6,32 +6,24 @@ namespace NF.Main.Core.GameStateMachine
 {
     public class EnemyTurn : TurnSystemBaseState
     {
-        //public static event Action<Action> OnEnemyTurnStart;
-
         private float _timer;
 
-        public EnemyTurn(TurnSystem turnSystem, TurnState turnState) : base(turnSystem, turnState) { }
+        public EnemyTurn(TurnSystem turnSystem, TurnState turnState) : base(turnSystem, turnState) 
+        { 
+        
+        }
 
         public override void OnEnter()
         {
             base.OnEnter();
             Debug.Log("Enemy's Turn!");
             _timer = 2f; // Set initial timer duration
-
-
         }
 
         public override void Update()
         {
-            if (_turnSystem.GetCurrentState() == TurnState.PlayerTurn)
-            {
+            if (_turnSystem.GetCurrentState() is TurnState.PlayerTurn or TurnState.Busy)
                 return;
-            }
-
-            if(_turnSystem.GetCurrentState() == TurnState.Busy)
-            {
-                return;
-            }
 
             _timer -= Time.deltaTime;
             if (_timer > 0f)
@@ -46,41 +38,7 @@ namespace NF.Main.Core.GameStateMachine
             else
             {
                 _turnSystem.NextTurn();
-                // idk if this should be handled by TurnSystem or if enemy turn should transition to player turn
-                //_turnSystem.SetStatePlayerTurn();
-
             }
-
-            //switch (_turnSystem.TurnState)
-            //{
-            //    case TurnState.WaitingForEnemyTurn:
-            //        Debug.Log("Still Player Turn");
-            //        break;
-            //    case TurnState.EnemyTakingTurn:
-            //        Debug.Log("Still Enemy Turn");
-
-            //        _timer -= Time.deltaTime;
-            //        if (_timer <= 0f)
-            //        {
-            //            //set busy state and take action
-            //            if (TryTakeEnemyAIAction(_turnSystem.SetStateEnemyTakingTurn))
-            //            {
-            //                _turnSystem.SetStateBusy();
-            //            }
-            //            else
-            //            {
-            //                // No more enemies have actions they can take, end enemy turn
-            //                _turnSystem.NextTurn();
-            //                _turnSystem.SetStateWaitingForEnemyTurn();
-            //            }
-
-            //        }
-            //        break;
-            //    case TurnState.Busy:
-            //        Debug.Log("Enemy Busy");
-
-            //        break;
-            //}
         }
 
         private bool TryTakeEnemyAIAction(Action onEnemyAIActionComplete)
@@ -126,7 +84,6 @@ namespace NF.Main.Core.GameStateMachine
         {
             base.OnExit();
             Debug.Log("Enemy Turn Finished");
-
         }
     }
 }

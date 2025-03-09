@@ -24,10 +24,10 @@ public class GridSystemVisual : Singleton<GridSystemVisual>
     //grid visual variables
     [SerializeField]
     private GameObject _gridVisualiserSinglePrefab;
-    private GridSystemVisualSingle[,] _gridSystemVisualSingleArray;
     [SerializeField] 
     private List<GridVisualTypeMaterial> gridVisualTypeMaterialList;
 
+    private GridSystemVisualSingle[,] _gridSystemVisualSingleArray;
 
     private void Awake()
     {
@@ -38,7 +38,9 @@ public class GridSystemVisual : Singleton<GridSystemVisual>
     {
         Initialize();
 
-        _gridSystemVisualSingleArray = new GridSystemVisualSingle[LevelGrid.Instance.GetWidth(), LevelGrid.Instance.GetHeight()];
+        int width = LevelGrid.Instance.GetWidth();
+        int height = LevelGrid.Instance.GetHeight();
+        _gridSystemVisualSingleArray = new GridSystemVisualSingle[width, height];
 
         // Create visuals along the grid
         for (int x = 0; x < LevelGrid.Instance.GetWidth(); x++)
@@ -65,25 +67,16 @@ public class GridSystemVisual : Singleton<GridSystemVisual>
 
     }
 
-    private void BaseUnitActionSystem_OnSelectedActionChanged(object sender, EventArgs e)
-    {
-        UpdateGridVisual();
-    }
-
-    private void LevelGrid_OnAnyUnitMovedGridPosition(object sender, EventArgs e)
-    {
-        UpdateGridVisual();
-    }
-
-
     //hide all grid visuals
     public void HideAllGridPositions()
     {
-        for (int x = 0; x < LevelGrid.Instance.GetWidth(); x++)
+        int width = LevelGrid.Instance.GetWidth();
+        int height = LevelGrid.Instance.GetHeight();
+
+        for (int x = 0; x < width; x++)
         {
-            for (int z = 0; z < LevelGrid.Instance.GetHeight(); z++)
+            for (int z = 0; z < height; z++)
             {
-                
                 _gridSystemVisualSingleArray[x, z].Hide();
             }
         }
@@ -92,19 +85,22 @@ public class GridSystemVisual : Singleton<GridSystemVisual>
     //show all grid visuals in given list
     public void ShowAllGridPositions(List<GridPosition> gridPositionList, GridVisualType gridVisualType)
     {
-        foreach(GridPosition gridPosition in gridPositionList)
+        Material material = GetGridVisualTypeMaterial(gridVisualType);
+
+        foreach (GridPosition gridPosition in gridPositionList)
         {
-            _gridSystemVisualSingleArray[gridPosition.x, gridPosition.z].Show(GetGridVisualTypeMaterial(gridVisualType));
+            _gridSystemVisualSingleArray[gridPosition.x, gridPosition.z].Show(material);
         }
-        
     }
 
     private void UpdateGridVisual()
     { 
         HideAllGridPositions();
+
         //show all selected unit's moveable positions
         BaseUnit selectedUnit = BaseUnitActionSystem.Instance.GetSelectedUnit();
         BaseAction selectedAction = BaseUnitActionSystem.Instance.GetSelectedAction();
+
         if(selectedAction != null)
         {
             GridVisualType gridVisualType;

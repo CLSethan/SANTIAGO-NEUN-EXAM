@@ -31,7 +31,6 @@ public class TurnSystemUI : MonoExt
     public override void OnSubscriptionSet()
     {
         base.OnSubscriptionSet();
-
         AddEvent(TurnSystem.Instance.OnTurnChanged, _ => UpdateTurnSystemUI());
     }
 

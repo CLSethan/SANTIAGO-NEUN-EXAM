@@ -1,8 +1,8 @@
 using UnityEngine;
 using TMPro;
+using NF.Main.Core;
 
-
-public class GridDebugObject : MonoBehaviour
+public class GridDebugObject : MonoExt
 {
     [SerializeField]
     private TextMeshPro _gridText;
@@ -10,7 +10,7 @@ public class GridDebugObject : MonoBehaviour
 
     public virtual void SetGridObject(object gridObject)
     {
-        this._gridObject = gridObject;
+        _gridObject = gridObject;
     }
     protected virtual void Update()
     {

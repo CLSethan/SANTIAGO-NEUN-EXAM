@@ -13,7 +13,7 @@ namespace NF.Main.Core.GameStateMachine
         public override void OnEnter()
         {
             base.OnEnter();
-            Debug.Log("Doing Action!");
+            Debug.Log("Unit bwwusy!");
 
             if (!_turnSystem.IsPlayerTurn())
             {
@@ -29,7 +29,7 @@ namespace NF.Main.Core.GameStateMachine
         public override void OnExit()
         {
             base.OnEnter();
-            Debug.Log("Finished Action!");
+            Debug.Log("Unit done busy!");
         }
     }
 }

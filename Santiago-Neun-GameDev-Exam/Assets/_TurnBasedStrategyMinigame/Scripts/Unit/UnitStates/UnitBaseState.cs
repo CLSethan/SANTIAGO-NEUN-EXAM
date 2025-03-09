@@ -9,7 +9,6 @@ namespace NF.Main.Core.PlayerStateMachine
 
         protected static readonly int AimingHash = Animator.StringToHash("Aiming");
         protected static readonly int ShootingHash = Animator.StringToHash("Shooting");
-        //protected static readonly int CooloffHash = Animator.StringToHash("Cooldown");
         protected static readonly int WalkingHash = Animator.StringToHash("Walking");
 
 

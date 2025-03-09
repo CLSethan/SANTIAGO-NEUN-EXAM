@@ -39,7 +39,6 @@ public class BaseUnitActionSystemUI : MonoExt
         AddEvent(BaseUnitActionSystem.Instance.OnActionStarted, _ => UpdateAPText());
         AddEvent(BaseUnit.OnAnyActionPointsChanged, _ => UpdateAPText());
         AddEvent(TurnSystem.Instance.OnTurnChanged, _ => UpdateAPText());
-
     }
 
     private void CreateUnitActionButtons()

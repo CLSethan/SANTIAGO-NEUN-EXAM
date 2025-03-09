@@ -19,16 +19,11 @@ public class BaseUnitController : MonoExt
 
     public UnitState UnitState { get; set; }
 
-    private void Awake()    
-    {
-        //SetupStateMachine();
-    }
-
     private void Start()
     {
         Initialize();
-        SetupStateMachine();
 
+        SetupStateMachine();
     }
 
     private void SetupStateMachine()

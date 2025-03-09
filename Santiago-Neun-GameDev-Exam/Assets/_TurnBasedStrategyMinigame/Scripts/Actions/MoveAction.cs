@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MoveAction : BaseAction
 {
-
+    // create Subject Events
     public Subject<Unit> OnStartMoving;
     public Subject<Unit> OnStopMoving;
 
@@ -20,6 +20,7 @@ public class MoveAction : BaseAction
     [SerializeField]
     private int _maxMoveDistance;
 
+    // Movement State
     private List<Vector3> positionList;
     private int currentPositionIndex;
 
@@ -43,14 +44,14 @@ public class MoveAction : BaseAction
         // if distance between current position and target position is further than stopping position, move to target position.
         if (Vector3.Distance(transform.position, targetPosition) > _stoppingDistance)
         {
+            // move and rotate towards target position
             transform.position += moveDirection * _moveSpeed * Time.deltaTime;
-
-            //rotate towards move direction
             transform.forward = Vector3.Lerp(transform.forward, moveDirection, _rotateSpeed * Time.deltaTime);
         }
 
         else
         {
+            // move to next position in path
             currentPositionIndex++;
             if (currentPositionIndex >= positionList.Count)
             {
@@ -92,47 +93,35 @@ public class MoveAction : BaseAction
                 GridPosition offsetGridPosition = new GridPosition(x, z);
                 GridPosition testGridPosition = offsetGridPosition + unitGridPosition;
 
-                //invalid if testgrid position is outside of levelgrid bounds
-                if(!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                if (IsValidMovePosition(unitGridPosition, testGridPosition))
                 {
-                    continue;
+                    validGridPositionList.Add(testGridPosition);
                 }
-                // invalid if unit is already on testgridposition
-                if(unitGridPosition == testGridPosition)
-                {
-                    continue;
-                }
-                // invalid if test grid position is occupied
-                if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
-                {
-                    continue;
-                }
-                // invalid if grid is not walkable
-                if (!Pathfinding.Instance.IsWalkableGridPosition(testGridPosition))
-                {
-                    continue;
-                }
-                // invalid if no path
-                if (!Pathfinding.Instance.HasPath(unitGridPosition, testGridPosition))
-                {
-                    continue;
-                }
-                //invalid if path is too long
-                int pathfindingDistanceMultiplier = 10;
-                if (Pathfinding.Instance.GetPathLength(unitGridPosition, testGridPosition) > _maxMoveDistance * pathfindingDistanceMultiplier)
-                {
-                    // Path length is too long
-                    continue;
-                }
-
-                // valid grid position
-                validGridPositionList.Add(testGridPosition);
             }
         }
         return validGridPositionList;
     }
 
-   public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    private bool IsValidMovePosition(GridPosition unitGridPosition, GridPosition testGridPosition)
+    {
+        //invalid if testgrid position is outside of levelgrid bounds
+        if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition)) return false;
+        // invalid if unit is already on testgridposition
+        if (unitGridPosition == testGridPosition) return false;
+        // invalid if test grid position is occupied
+        if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition)) return false;
+        // invalid if grid is not walkable
+        if (!Pathfinding.Instance.IsWalkableGridPosition(testGridPosition)) return false;
+        // invalid if no path
+        if (!Pathfinding.Instance.HasPath(unitGridPosition, testGridPosition)) return false;
+        //invalid if path is too long
+        int pathfindingDistanceMultiplier = 10;
+        if (Pathfinding.Instance.GetPathLength(unitGridPosition, testGridPosition) > _maxMoveDistance * pathfindingDistanceMultiplier) return false;
+        else return true;
+
+    }
+
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         int targetCountAtGridPosition = _unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);
 
@@ -142,15 +131,5 @@ public class MoveAction : BaseAction
             actionValue = targetCountAtGridPosition * 10,
         };
     }
-    public override int GetActionPointCost()
-    {
-        return 3;
-    }
 
-    public override string GetActionName()
-    {
-        return "Move";
-    }
-
-    
 }

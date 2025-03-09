@@ -13,21 +13,26 @@ public class PathfindingGridDebugObject : GridDebugObject
     [SerializeField] 
     private SpriteRenderer _isWalkableSpriteRenderer;
 
-    private PathNode pathNode;
+    private PathNode _pathNode;
 
     public override void SetGridObject(object gridObject)
     {
         base.SetGridObject(gridObject);
-        pathNode = (PathNode)gridObject;
+        if (gridObject is PathNode node)
+        {
+            _pathNode = node;
+        }
     }
 
     protected override void Update()
     {
         base.Update();
-        _gCostText.text = pathNode.GetGCost().ToString();
-        _hCostText.text = pathNode.GetHCost().ToString();
-        _fCostText.text = pathNode.GetFCost().ToString();
-        _isWalkableSpriteRenderer.color = pathNode.IsWalkable() ? Color.green : Color.red;
+        if (_pathNode == null) return;
+
+        _gCostText.text = _pathNode.GetGCost().ToString();
+        _hCostText.text = _pathNode.GetHCost().ToString();
+        _fCostText.text = _pathNode.GetFCost().ToString();
+        _isWalkableSpriteRenderer.color = _pathNode.IsWalkable() ? Color.green : Color.red;
 
     }
 

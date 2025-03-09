@@ -21,7 +21,7 @@ namespace NF.Main.Core.PlayerStateMachine
         {
             base.OnEnter();
             //Use this for transitioning between different animator hashes
-            Debug.Log("Unit is shooting");
+            Debug.Log("Unit entered Shoot State");
 
             _animator.CrossFade(ShootingHash, 0f);
 
@@ -39,9 +39,7 @@ namespace NF.Main.Core.PlayerStateMachine
         {
 
             base.Update();
-         //   Debug.Log("Player is Idling");
-
-    
+            Debug.Log("Unit Shooting");
         }
 
         public override void OnExit()

@@ -4,47 +4,37 @@ using System.Collections.Generic;
 
 public class SpinAction : BaseAction
 {
-
     private float _totalSpinAmount;
-
 
     private void Update()
     {
-        if (!_isActive)
-        {
-            return;
-        }
+        if (!_isActive) return;
 
-        float spinAddAmount = 360f * Time.deltaTime;
-        transform.eulerAngles += new Vector3(0, spinAddAmount, 0);
+        PerformSpin();
+    }
+
+    public void PerformSpin()
+    {
+        float spinAddAmount = 360f * Time.deltaTime; // Calculate rotation step
+        transform.eulerAngles += new Vector3(0, spinAddAmount, 0); // Apply rotation
 
         _totalSpinAmount += spinAddAmount;
+
         if (_totalSpinAmount >= 360f)
         {
-            ActionComplete();
+            ActionComplete(); // Mark action as complete when full rotation is reached
         }
     }
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        _totalSpinAmount = 0f;
+        _totalSpinAmount = 0f; // Reset spin progress
         ActionStart(onActionComplete);
-    }
-
-    public override string GetActionName()
-    {
-        return "Spin";
     }
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        // get current grid position
-        GridPosition unitGridPosition = _unit.GetGridPosition();
-
-        return new List<GridPosition>
-        {
-            unitGridPosition
-        };
+        return new List<GridPosition> { _unit.GetGridPosition() };
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -55,12 +45,4 @@ public class SpinAction : BaseAction
             actionValue = 0,
         };
     }
-
-
-    public override int GetActionPointCost()
-    {
-        return 2;
-    }
-
-
 }

@@ -117,6 +117,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea83206ed796bfc44b0cafbdeb60f1bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   _actionPointsText: {fileID: 7837785660479733431}
   _unit: {fileID: 326364872527184129}
   _healthBarImage: {fileID: 9144119852296726361}
@@ -355,6 +364,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7621a2817aa07574690d7c1c8546af47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   _unit: {fileID: 326364872527184129}
 --- !u!1 &4715674361346045559
 GameObject:
@@ -679,6 +697,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a604dc3b1d09e64a950bec68aa6c1b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: OnStartMoving
+      Entry: 6
+      Data: 
+    - Name: OnStopMoving
+      Entry: 6
+      Data: 
+  _actionPoint: 3
+  _actionName: Move
   _moveSpeed: 8
   _rotateSpeed: 15
   _stoppingDistance: 0.1
@@ -695,6 +730,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9097d9abe15bded48a78e998c5c058c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _actionPoint: 1
+  _actionName: Spin
 --- !u!114 &326364872527184129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,6 +753,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc916ffb1c3a3384e8554a90fcb1b6ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   unitData: {fileID: 11400000, guid: 7eab3d518d18ed54193f3384dcb1d9f0, type: 2}
 --- !u!114 &6356224770722049357
 MonoBehaviour:
@@ -720,12 +775,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9b495c16a0b5b24aa13d77447e06834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: OnShoot
+      Entry: 6
+      Data: 
+    - Name: OnStopShooting
+      Entry: 6
+      Data: 
+  _actionPoint: 2
+  _actionName: Shoot
   _maxShootDistance: 5
   _aimingStateTime: 1
   _shootStateTime: 0.1
   _cooloffStateTime: 0.5
   _damage: 40
-  obstaclesLayerMask:
+  _obstaclesLayerMask:
     serializedVersion: 2
     m_Bits: 256
 --- !u!114 &6016276909642320553
@@ -740,6 +812,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 699fd1c3c458ee9489b6bf5ef09f2fc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   _unitAnimator: {fileID: 3579581599390250686}
   _bulletProjectilePrefab: {fileID: 487831032091585754, guid: c636866ef7a9d4a4c8dc66ddc8417200, type: 3}
   _shootPoint: {fileID: 412489888914718647}
@@ -769,6 +850,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0c3baff1a92ac14baf1b6082a6ad6e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
   _unitRagdollPrefab: {fileID: 7874727382800629800, guid: cf67422ccdf9e8c4f840b808c5809fb7, type: 3}
   _originalRootBone: {fileID: 3524299249765483452}
 --- !u!1001 &3528983323424020710

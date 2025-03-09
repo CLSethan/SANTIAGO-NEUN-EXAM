@@ -7,10 +7,9 @@ using UniRx;
 
 public class LevelGrid : Singleton<LevelGrid>
 {
-
+    // create Subject Events
     public Subject<GridPosition> OnAnyUnitMovedGridPosition;
 
-    private GridSystem<GridObject> _gridSystem;
     [SerializeField]
     private int _levelGridWidth;
     [SerializeField] 
@@ -19,6 +18,9 @@ public class LevelGrid : Singleton<LevelGrid>
     private float _levelGridCellsize = 2f;
     [SerializeField]
     private GameObject _gridDebugObjectPrefab;
+
+    private GridSystem<GridObject> _gridSystem;
+
 
 
     private void Awake()
@@ -29,7 +31,7 @@ public class LevelGrid : Singleton<LevelGrid>
                         (GridSystem<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition));
         // Initialize Events
         OnAnyUnitMovedGridPosition = new Subject<GridPosition>();
-
+        // uncomment for debugging
         //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
     }
 
@@ -38,13 +40,14 @@ public class LevelGrid : Singleton<LevelGrid>
         Pathfinding.Instance.Setup(_levelGridWidth, _levelGridHeight, _levelGridCellsize);
     }
 
-    // add unit to list of units at current grid position
+    // Add unit to the grid
     public void AddUnitAtGridPosition(GridPosition gridPosition, BaseUnit unit)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.AddUnit(unit);
     }
-    // get units at current grid position
+
+    // Get all units at a grid position
     public List<BaseUnit> GetUnitListAtGridPosition(GridPosition gridPosition)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
@@ -52,50 +55,40 @@ public class LevelGrid : Singleton<LevelGrid>
 
     }
 
-    // remove unit from list at current grid position
+    // Remove a unit from a grid position
     public void RemoveUnitAtGridPosition(GridPosition gridPosition, BaseUnit unit)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         gridObject.RemoveUnit(unit);
     }
 
-    // update grid position when unit moves
+    // Update unit's grid position when moving
     public void UnitMovedGridPosition(BaseUnit unit, GridPosition fromGridPosition, GridPosition toGridPosition)
     {
         RemoveUnitAtGridPosition(fromGridPosition, unit);
         AddUnitAtGridPosition(toGridPosition, unit);
-        OnAnyUnitMovedGridPosition.OnNext(toGridPosition); // Emits the event
+        OnAnyUnitMovedGridPosition.OnNext(toGridPosition); 
     }
 
-    // get grid position of world position
+    // Convert world position to grid position
     public GridPosition GetGridPosition(Vector3 worldPos)
     {
         return _gridSystem.GetGridPosition(worldPos);
     }
 
-    // get world position of grid position
+    // Convert grid position to world position
     public Vector3 GetWorldPosition(GridPosition gridPosition)
     {
         return _gridSystem.GetWorldPosition(gridPosition);
     }
 
-    // check if grid position is valid 
+    // Check if a grid position is within valid bounds
     public bool IsValidGridPosition(GridPosition gridPosition)
     {
         return _gridSystem.IsValidGridPosition(gridPosition);
     }
 
-    public int GetWidth()
-    {
-        return _gridSystem.GetWidth();
-    }
-
-    public int GetHeight()
-    {
-        return _gridSystem.GetHeight();
-    }
-
-    //check if grid position is occupied by another unit
+    // Check if a grid position has a unit
     public bool HasAnyUnitOnGridPosition(GridPosition gridPosition)
     {
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
@@ -108,4 +101,8 @@ public class LevelGrid : Singleton<LevelGrid>
         GridObject gridObject = _gridSystem.GetGridObject(gridPosition);
         return gridObject.GetUnit();
     }
+
+    // Get grid dimensions
+    public int GetWidth() => _gridSystem.GetWidth();
+    public int GetHeight() => _gridSystem.GetHeight();
 }

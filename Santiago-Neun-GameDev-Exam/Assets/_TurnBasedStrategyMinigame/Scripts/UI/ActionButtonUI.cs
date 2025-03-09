@@ -15,7 +15,8 @@ public class ActionButtonUI : MonoBehaviour
     private BaseAction _baseAction;
     public void SetBaseAction(BaseAction baseAction)
     {
-        this._baseAction = baseAction;
+        _baseAction = baseAction;
+
         // get action name
         _textMeshPro.text = baseAction.GetActionName().ToUpper();
 

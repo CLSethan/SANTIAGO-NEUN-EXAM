@@ -14,71 +14,33 @@ public class PathNode
 
     public PathNode(GridPosition gridPosition)
     {
-        this._gridPosition = gridPosition;
+        _gridPosition = gridPosition;
     }
-    public bool IsWalkable()
-    {
-        return _isWalkable;
-    }
+    
+    public bool IsWalkable() => _isWalkable;
 
-    public void SetIsWalkable(bool isWalkable)
-    {
-        this._isWalkable = isWalkable;
-    }
+    public void SetIsWalkable(bool isWalkable) => _isWalkable = isWalkable;
 
-    public override string ToString()
-    {
-        return _gridPosition.ToString();
-    }
+    public override string ToString() => _gridPosition.ToString();
 
-    public int GetGCost()
-    {
-        return _gCost;
-    }
+    public int GetGCost() => _gCost;
 
-    public int GetHCost()
-    {
-        return _hCost;
-    }
+    public int GetHCost() => _hCost;
 
-    public int GetFCost()
-    {
-        return _fCost;
-    }
+    public int GetFCost() => _fCost;
 
-    public void SetGCost(int gCost)
-    {
-        this._gCost = gCost;
-    }
+    public void SetGCost(int gCost) => _gCost = gCost;
 
-    public void SetHCost(int hCost)
-    {
-        this._hCost = hCost;
-    }
+    public void SetHCost(int hCost) => _hCost = hCost;
 
-    public void CalculateFCost()
-    {
-        _fCost = _gCost + _hCost;
-    }
+    public void CalculateFCost() => _fCost = _gCost + _hCost;
 
-    public void ResetCameFromPathNode()
-    {
-        _cameFromPathNode = null;
-    }
+    public void ResetCameFromPathNode() => _cameFromPathNode = null;
 
-    public void SetCameFromPathNode(PathNode pathNode)
-    {
-        _cameFromPathNode = pathNode;
-    }
+    public void SetCameFromPathNode(PathNode pathNode) => _cameFromPathNode = pathNode;
 
-    public PathNode GetCameFromPathNode()
-    {
-        return _cameFromPathNode;
-    }
+    public PathNode GetCameFromPathNode() => _cameFromPathNode;
 
-    public GridPosition GetGridPosition()
-    {
-        return _gridPosition;
-    }
+    public GridPosition GetGridPosition() => _gridPosition;
 
 }

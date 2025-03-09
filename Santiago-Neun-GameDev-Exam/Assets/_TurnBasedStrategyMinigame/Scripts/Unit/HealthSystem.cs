@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class HealthSystem : MonoBehaviour
 {
-
-    //public event EventHandler OnDeath;
-    //public event EventHandler OnDamaged;
-
     public Subject<Unit> OnDeath = new Subject<Unit>();
     public Subject<Unit> OnDamaged = new Subject<Unit>();
 

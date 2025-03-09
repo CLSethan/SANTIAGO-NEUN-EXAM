@@ -18,7 +18,6 @@ public class InputManager : Singleton<InputManager>
         _unitInputActions.Player.Enable();
     }
 
-
     public Vector2 GetMouseScreenPosition()
     {
         return Mouse.current.position.ReadValue();
@@ -43,7 +42,5 @@ public class InputManager : Singleton<InputManager>
     {
         return _unitInputActions.Player.CameraZoom.ReadValue<float>();
     }
-
-
 }
 

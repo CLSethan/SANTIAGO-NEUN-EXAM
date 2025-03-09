@@ -2,21 +2,19 @@ using NF.Main.Core.PlayerStateMachine;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UniRx;
+using UnityEditor;
 
 public class ShootAction : BaseAction
 {
-
+    // create Subject Events
     public Subject<OnShootEventArgs> OnShoot;
     public Subject<Unit> OnStopShooting;
-
 
     public class OnShootEventArgs
     {
         public BaseUnit TargetUnit { get; }
         public BaseUnit ShootingUnit { get; }
-
 
         public OnShootEventArgs(BaseUnit targetUnit, BaseUnit shootingUnit)
         {
@@ -36,13 +34,11 @@ public class ShootAction : BaseAction
     [SerializeField]
     private int _damage = 40;
     [SerializeField] 
-    private LayerMask obstaclesLayerMask;
+    private LayerMask _obstaclesLayerMask;
 
     private float _stateTimer;
-
     private BaseUnit _targetUnit;
     private bool _canShoot;
-
     private UnitState _state;
 
     protected override void Awake()
@@ -52,22 +48,16 @@ public class ShootAction : BaseAction
         OnStopShooting = new Subject<Unit>();
     }
 
-
     private void Update()
     {
-        if (!_isActive)
-        {
-            return;
-        }
+        if (!_isActive) return;
 
         _stateTimer -= Time.deltaTime;
 
         switch(_state)
         {
             case UnitState.Aiming:
-                Vector3 AimDir = (_targetUnit.GetWorldPosition() - _unit.GetWorldPosition()).normalized;
-                float _rotateSpeed = 10f;
-                transform.forward = Vector3.Lerp(transform.forward, AimDir, _rotateSpeed * Time.deltaTime);
+                AimAtTarget();
                 break;
             case UnitState.Shooting:
                 if(_canShoot)
@@ -80,35 +70,45 @@ public class ShootAction : BaseAction
                 break;
         }
 
-        if (_stateTimer <= 0f)
-        {
-            NextState();
-        }
+        if (_stateTimer <= 0f) NextState();
     }
 
+    //handles transitioning to the next state in the shooting process.
     private void NextState()
     {
         switch (_state)
         {
             case UnitState.Aiming:
-                _state = UnitState.Shooting;
-                _stateTimer = _shootStateTime;
+                TransitionToState(UnitState.Shooting, _shootStateTime);
                 break;
             case UnitState.Shooting:
-                _state = UnitState.Cooldown;
-                _stateTimer = _cooloffStateTime;
+                TransitionToState(UnitState.Cooldown, _cooloffStateTime);
                 break;
             case UnitState.Cooldown:
-                OnStopShooting.OnNext(Unit.Default); // Emit event
+                OnStopShooting.OnNext(Unit.Default); //notify subscribers
                 ActionComplete();
                 break;
         }
     }
 
+    //update state and duration
+    private void TransitionToState(UnitState newState, float duration)
+    {
+        _state = newState;
+        _stateTimer = duration;
+    }
+
+    // rotate unit to face target
+    private void AimAtTarget()
+    {
+        Vector3 AimDir = (_targetUnit.GetWorldPosition() - _unit.GetWorldPosition()).normalized;
+        float _rotateSpeed = 10f;
+        transform.forward = Vector3.Lerp(transform.forward, AimDir, _rotateSpeed * Time.deltaTime);
+    }
+
     private void Shoot()
     {
-        OnShoot.OnNext(new OnShootEventArgs(_targetUnit, _unit)); // Emit event
-
+        OnShoot.OnNext(new OnShootEventArgs(_targetUnit, _unit)); //notify subscribers
         _targetUnit.Damage(_damage);
     }
 
@@ -123,21 +123,10 @@ public class ShootAction : BaseAction
         };
     }
 
-    //get validated targetable units at grid position
+    //gets the number of valid targets at a given grid position.
     public int GetTargetCountAtPosition(GridPosition gridPosition)
     {
         return GetValidActionGridPositionList(gridPosition).Count;
-    }
-
-
-    public override string GetActionName()
-    {
-        return "Shoot";
-    }
-
-    public override int GetActionPointCost()
-    {
-        return 2;
     }
 
     public override List<GridPosition> GetValidActionGridPositionList()
@@ -146,61 +135,57 @@ public class ShootAction : BaseAction
         return GetValidActionGridPositionList(unitGridPosition);
     }
 
-    //cycle through valid shootable units at grid position
+    //Determines valid grid positions for shooting based on range, obstacles, and target validation.
     public List<GridPosition> GetValidActionGridPositionList(GridPosition unitGridPosition)
     {
-        List<GridPosition> validGridPositionList = new List<GridPosition>();
+        List<GridPosition> validGridPositions = new List<GridPosition>();
 
-        //cycle through moveable grid positions within max range
         for (int x = -_maxShootDistance; x <= _maxShootDistance; x++)
         {
             for (int z = -_maxShootDistance; z <= _maxShootDistance; z++)
             {
-                GridPosition offsetGridPosition = new GridPosition(x, z);
-                GridPosition testGridPosition = offsetGridPosition + unitGridPosition;
+                GridPosition testGridPosition = new GridPosition(x, z) + unitGridPosition;
 
-                //invalid if testgrid position is outside of levelgrid bounds
-                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
-                {
-                    continue;
-                }
+                if (!IsValidShootingPosition(unitGridPosition, testGridPosition)) continue;
 
-                // create circular range based on max shoot distance
-                int testDistance = Mathf.Abs(x) + Mathf.Abs(z);
-                if(testDistance > _maxShootDistance)
-                {
-                    continue;
-                }
-
-                // invalid if test grid position is not occupied
-                if (!LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
-                {
-                    continue;
-                }
-                // invalid if both units are the same kind
-                BaseUnit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
-                if(targetUnit.IsEnemy() == _unit.IsEnemy())
-                {
-                    continue;
-                }
-                // invalid if being blocked by an obstacle
-                Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitGridPosition);
-                Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
-                float unitShoulderHeight = 1.7f;
-
-                if (Physics.Raycast( unitWorldPosition + Vector3.up * unitShoulderHeight, shootDir, 
-                    Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()),
-                    obstaclesLayerMask))
-                {
-                    continue;
-                }
-
-
-                // valid grid position
-                validGridPositionList.Add(testGridPosition);
+                validGridPositions.Add(testGridPosition);
             }
         }
-        return validGridPositionList;
+
+        return validGridPositions;
+    }
+
+    // check if target is valid
+    private bool IsValidShootingPosition(GridPosition unitGridPosition, GridPosition testGridPosition)
+    {
+        //invalid if testgrid position is outside of levelgrid bounds
+        if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition)) return false;
+        // create circular range based on max shoot distance
+        int testDistance = Mathf.Abs(testGridPosition.x - unitGridPosition.x) + Mathf.Abs(testGridPosition.z - unitGridPosition.z);
+        //invalid if out of range
+        if (testDistance > _maxShootDistance) return false;
+        // invalid if test grid position is not occupied
+        if (!LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition)) return false;
+        // invalid if both units are on the same team
+        BaseUnit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
+        if (targetUnit.IsEnemy() == _unit.IsEnemy()) return false;
+        // invalid if being blocked by an obstacle
+        return !IsObstructedByObstacle(unitGridPosition, targetUnit);
+    }
+
+    // check if blocked by obstacle
+    private bool IsObstructedByObstacle(GridPosition unitGridPosition, BaseUnit targetUnit)
+    {
+        Vector3 unitWorldPosition = LevelGrid.Instance.GetWorldPosition(unitGridPosition);
+        Vector3 shootDirection = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+        float unitShoulderHeight = 1.7f;
+
+        return Physics.Raycast(
+            unitWorldPosition + Vector3.up * unitShoulderHeight,
+            shootDirection,
+            Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()),
+            _obstaclesLayerMask
+        );
     }
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
@@ -210,18 +195,10 @@ public class ShootAction : BaseAction
         _state = UnitState.Aiming;
         _stateTimer = _aimingStateTime;
         _canShoot = true;
+
         ActionStart(onActionComplete);
-
     }
 
-    public BaseUnit GetTargetUnit()
-    {
-        return _targetUnit;
-    }
-
-    public int GetMaxShootDistance()
-    {
-        return _maxShootDistance;
-    }
-
+    public BaseUnit GetTargetUnit() => _targetUnit;
+    public int GetMaxShootDistance() => _maxShootDistance;
 }

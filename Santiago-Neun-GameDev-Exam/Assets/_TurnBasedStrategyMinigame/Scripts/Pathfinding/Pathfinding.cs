@@ -10,13 +10,12 @@ public class Pathfinding : Singleton<Pathfinding>
 
     [SerializeField] 
     private GameObject _gridDebugObjectPrefab;
+    [SerializeField]
+    private LayerMask _obstaclesLayerMask;
 
     private int _width;
     private int _height;
     private float _cellSize;
-
-    [SerializeField] 
-    private LayerMask _obstaclesLayerMask;
 
     private GridSystem<PathNode> _gridSystem;
 
@@ -27,21 +26,29 @@ public class Pathfinding : Singleton<Pathfinding>
 
     public void Setup(int width, int height, float cellSize)
     {
-        this._width = width;
-        this._height = height;
-        this._cellSize = cellSize;
+        _width = width;
+        _height = height;
+        _cellSize = cellSize;
 
-        _gridSystem = new GridSystem<PathNode>(width, height, cellSize,
+        _gridSystem = new GridSystem<PathNode>(_width, _height, _cellSize,
             (GridSystem<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
-        //_gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
 
-        GetNode(1,0).SetIsWalkable(false);
-        GetNode(1,1).SetIsWalkable(false);
+       // _gridSystem.CreateDebugObjects(_gridDebugObjectPrefab);
+
+        InitializeNodes();
+    }
+
+
+    private void InitializeNodes()
+    {
+
+        GetNode(1, 0).SetIsWalkable(false);
+        GetNode(1, 1).SetIsWalkable(false);
 
         //cycle through grid
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < _width; x++)
         {
-            for (int z = 0; z < height; z++)
+            for (int z = 0; z < _height; z++)
             {
                 //raycast detection for obstacles
                 GridPosition gridPosition = new GridPosition(x, z);
@@ -56,8 +63,6 @@ public class Pathfinding : Singleton<Pathfinding>
         }
     }
 
-
-
     public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
     {
         // list of nodes queued for searching
@@ -70,21 +75,7 @@ public class Pathfinding : Singleton<Pathfinding>
         PathNode endNode = _gridSystem.GetGridObject(endGridPosition);
         openList.Add(startNode);
 
-        //cycle through all nodes and reset state
-        for (int x = 0; x < _gridSystem.GetWidth(); x++)
-        {
-            for (int z = 0; z < _gridSystem.GetHeight(); z++)
-            {
-                GridPosition gridPosition = new GridPosition(x, z);
-                PathNode pathNode = _gridSystem.GetGridObject(gridPosition);
-
-                //initialize costs
-                pathNode.SetGCost(int.MaxValue);
-                pathNode.SetHCost(0);
-                pathNode.CalculateFCost();
-                pathNode.ResetCameFromPathNode();
-            }
-        }
+        ResetNodes();
 
         startNode.SetGCost(0);
         startNode.SetHCost(CalculateDistance(startGridPosition, endGridPosition));
@@ -122,9 +113,7 @@ public class Pathfinding : Singleton<Pathfinding>
                     continue;
                 }
 
-
-                int tentativeGCost =
-                    currentNode.GetGCost() + CalculateDistance(currentNode.GetGridPosition(), neighbourNode.GetGridPosition());
+                int tentativeGCost = currentNode.GetGCost() + CalculateDistance(currentNode.GetGridPosition(), neighbourNode.GetGridPosition());
 
                 // compare Gcost for better path
                 if (tentativeGCost < neighbourNode.GetGCost())
@@ -146,6 +135,25 @@ public class Pathfinding : Singleton<Pathfinding>
         // No path found
         pathLength = 0;
         return null;
+    }
+
+    private void ResetNodes()
+    {
+        //cycle through all nodes and reset state
+        for (int x = 0; x < _gridSystem.GetWidth(); x++)
+        {
+            for (int z = 0; z < _gridSystem.GetHeight(); z++)
+            {
+                GridPosition gridPosition = new GridPosition(x, z);
+                PathNode pathNode = _gridSystem.GetGridObject(gridPosition);
+
+                //initialize costs
+                pathNode.SetGCost(int.MaxValue);
+                pathNode.SetHCost(0);
+                pathNode.CalculateFCost();
+                pathNode.ResetCameFromPathNode();
+            }
+        }
     }
 
     public int CalculateDistance(GridPosition gridPositionA, GridPosition gridPositionB)

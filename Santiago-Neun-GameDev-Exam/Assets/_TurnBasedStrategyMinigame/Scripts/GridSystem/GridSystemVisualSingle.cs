@@ -1,6 +1,7 @@
+using NF.Main.Core;
 using UnityEngine;
 
-public class GridSystemVisualSingle : MonoBehaviour
+public class GridSystemVisualSingle : MonoExt
 {
     [SerializeField]
     private MeshRenderer _meshRenderer;
@@ -9,7 +10,6 @@ public class GridSystemVisualSingle : MonoBehaviour
     {
         _meshRenderer.enabled = true;
         _meshRenderer.material = material;
-
     }
 
     public void Hide()

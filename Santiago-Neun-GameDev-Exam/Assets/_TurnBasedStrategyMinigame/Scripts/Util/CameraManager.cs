@@ -25,7 +25,6 @@ public class CameraManager : MonoExt
         AddEvent(BaseAction.OnAnyActionCompleted, OnActionCompleted);
     }
 
-
     private void ShowActionCamera()
     {
         _actionCameraGameObject.SetActive(true);

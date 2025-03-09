@@ -1,6 +1,7 @@
+using NF.Main.Core;
 using UnityEngine;
 
-public class LookAtCamera : MonoBehaviour
+public class LookAtCamera : MonoExt
 {
     [SerializeField] 
     private bool _invert;
@@ -19,10 +20,10 @@ public class LookAtCamera : MonoBehaviour
             Vector3 cameraDir = (_cameraTransform.position - transform.position).normalized;
             transform.LookAt(transform.position + cameraDir * -1);
         }
+
         else
         {
             transform.LookAt(_cameraTransform);
         }
     }
-
 }

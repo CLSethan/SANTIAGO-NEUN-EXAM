@@ -9,7 +9,6 @@ namespace NF.Main.Gameplay
     {
         public TurnState TurnState;
         public StateMachine _stateMachine;
-        //public event EventHandler OnTurnChanged;
 
         public Subject<Unit> OnTurnChanged;
 
@@ -18,22 +17,20 @@ namespace NF.Main.Gameplay
 
         private void Awake()
         {
-            Initialize();
-
             Instance = this;
             OnTurnChanged = new Subject<Unit>();
+        }
+
+        private void Start()
+        {
+            Initialize();
+            TurnState = TurnState.PlayerTurn;
+            SetupStateMachine();
         }
 
         private void Update()
         {
             _stateMachine.Update();
-        }
-
-        public override void Initialize(object data = null)
-        {
-            base.Initialize(data);
-            TurnState = TurnState.PlayerTurn;
-            SetupStateMachine();
         }
 
         private void SetupStateMachine()
@@ -50,15 +47,9 @@ namespace NF.Main.Gameplay
             // Define transitions
             At(playerTurn, enemyTurn, new FuncPredicate(() => TurnState == TurnState.EnemyTurn));
             At(enemyTurn, playerTurn, new FuncPredicate(() => TurnState == TurnState.PlayerTurn));
-
             At(enemyTurn, busyState, new FuncPredicate(() => TurnState == TurnState.Busy));
             At(busyState, enemyTurn, new FuncPredicate(() => TurnState == TurnState.EnemyTurn));
 
-
-            //At(playingState, gameOverState, new FuncPredicate(() => GameState == GameState.GameOver));
-
-
-            // Any(playingState, new FuncPredicate(() => GameState == GameState.Playing));
             Any(playerTurn, new FuncPredicate(() => TurnState == TurnState.PlayerTurn));
            
             // Set initial state
@@ -86,41 +77,18 @@ namespace NF.Main.Gameplay
             OnTurnChanged.OnNext(Unit.Default);
         }
 
-        public int GetTurnNumber()
-        {
-            return _turnNumber;
-        }
+        public TurnState GetCurrentState() => TurnState;
 
-        public bool IsPlayerTurn()
-        {
-            return _isPlayerTurn;
-        }
+        public int GetTurnNumber() => _turnNumber;
 
-        public bool SetIsPlayerTurn(bool isPlayerTurn)
-        {
-            return _isPlayerTurn = isPlayerTurn;
-        }
+        public bool IsPlayerTurn() => _isPlayerTurn;
 
-        public void SetStateEnemyTurn()
-        {
-            TurnState = TurnState.EnemyTurn;
-        }
+        public void SetIsPlayerTurn(bool isPlayerTurn) => _isPlayerTurn = isPlayerTurn;
 
-        public void SetStateBusy()
-        {
-            TurnState = TurnState.Busy;
+        public void SetStateEnemyTurn() => TurnState = TurnState.EnemyTurn;
 
-        }
+        public void SetStateBusy() => TurnState = TurnState.Busy;
 
-        public void SetStatePlayerTurn()
-        {
-            TurnState = TurnState.PlayerTurn;
-
-        }
-
-        public TurnState GetCurrentState()
-        {
-            return TurnState;
-        }
+        public void SetStatePlayerTurn() => TurnState = TurnState.PlayerTurn;
     }
 }
